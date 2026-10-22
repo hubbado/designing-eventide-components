@@ -4,16 +4,6 @@ Each rule records a cost already paid or a decision already taken, with its
 reason. Apply them when you sketch candidate models, when you write the
 model, and when you walk the scenarios.
 
-When a review or an incident teaches a new rule, write it down where the
-project keeps its rules, in the form used here: the rule, **Why**, and
-**In the model**, with
-a **Source** that names the change log entry or the incident that taught it,
-instead of retelling its details. Write it for a reader who designs another
-component and has never seen the design that taught it. Use general nouns,
-such as an entity, a document or a start time, or explain each noun in its
-sentence. A rule that holds for every Eventide design can be proposed to this
-skill, without its Source.
-
 ## Contents
 
 - The parts of a design
@@ -627,8 +617,7 @@ through it, and nothing recorded is ever taken back.
 handler wrote, say so in the model's `questions`, and record the concern in
 the design document's Open.
 
-**Ways that complexity has been reduced.** When a design finds a new way,
-write it down in the same form, and propose it to this skill.
+**Ways that complexity has been reduced:**
 
 - **Let the entity that acts be bounded by what is recorded.** Record facts
   generously, and let a later decision, made by the entity that acts, choose
