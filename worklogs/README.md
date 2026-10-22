@@ -23,3 +23,5 @@ the `# `.
 
 Start each bullet with a tag that says what it is, such as `[decision]`,
 `[rejected]`, `[finding]`, `[problem]` or `[open]`.
+
+Name each person by their full name, such as Sam Stickland.
