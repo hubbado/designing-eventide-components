@@ -1,0 +1,693 @@
+<!-- Draws the DIAGRAM data block below as Excalidraw lane panels, with time running from left to right. -->
+<title>Event Flow Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<script>
+// The presentation of examples/purchase-orders/event-flows.yaml and scenarios.md.
+window.DIAGRAM = {
+  title: "Purchase order assignments",
+  summary: "Adding an assignment to a purchase order, and removing it. The model is examples/purchase-orders/event-flows.yaml.",
+  questions: [],
+  panels: [
+    {
+      name: "Overview: An assignment is added to a purchase order, and later removed",
+      lanes: [
+        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 300 },
+        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 560 },
+        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1000 },
+        { id: "po", label: "purchaseOrder-{id}", component: "purchaseOrder", kind: "entity", y: 1280 }
+      ],
+      messages: [
+        { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "initiated", lane: "assignment", column: 0, title: "Add To Purchase Order Initiated",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "add-assignment", lane: "po-command", column: 0, title: "Add Assignment",
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "client_id", "currency", "user_id?"] },
+        { id: "sent", lane: "assignment", column: 1, title: "Purchase Order Add Assignment Sent",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "assignment-added", lane: "po", column: 0, title: "Assignment Added",
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "client_id", "currency", "user_id?"] },
+        { id: "added-to-po", lane: "assignment", column: 2, title: "Added To Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "remove-from-po", lane: "assignment-command", column: 3, title: "Remove From Purchase Order",
+          attrs: ["assignment_id", "user_id?"] },
+        { id: "remove-assignment", lane: "po-command", column: 3, title: "Remove Assignment",
+          attrs: ["purchase_order_id", "assignment_id", "user_id?"] },
+        { id: "removed-from-po", lane: "assignment", column: 4, title: "Removed From Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "user_id?"] },
+        { id: "assignment-removed", lane: "po", column: 3, title: "Assignment Removed",
+          attrs: ["purchase_order_id", "assignment_id", "user_id?"] }
+      ],
+      links: [
+        { from: "add-to-po", to: "initiated" },
+        { from: "initiated", to: "add-assignment" },
+        { from: "initiated", to: "sent" },
+        { from: "add-assignment", to: "assignment-added" },
+        { from: "added-to-po", to: "assignment-added", kind: "reads" },
+        { from: "remove-from-po", to: "remove-assignment" },
+        { from: "remove-from-po", to: "removed-from-po" },
+        { from: "remove-assignment", to: "assignment-removed" }
+      ],
+      notes: [
+        { id: "note-1", column: 1, y: 690, width: 240,
+          text: "1. The assignment records that it is being added, with a new addition id. A second handler sends the request, with the assignment's currency and client, and records that it went.",
+          points: [{ to: "initiated", toAt: 0.85 }, { to: "sent", toAt: 0.4 }, { to: "add-assignment", toAt: 0.85 }] },
+        { id: "note-2", column: 0.4, y: 1520, width: 300,
+          text: "2. The currencies and the clients are the same, so the purchase order adds the assignment.",
+          points: [{ to: "assignment-added", toAt: 0.15 }] },
+        { id: "note-3", column: 2, y: 20, width: 240,
+          text: "3. The assignment records the answer, because its addition id is the one that it waits for.",
+          points: [{ to: "added-to-po" }] },
+        { id: "note-4", column: 3.75, y: 20, width: 330,
+          text: "4. The command does not name the purchase order: the assignment knows which one it is on. It tells the purchase order to remove it, and records the removal at once. It assumes that the removal succeeds, because Remove Assignment cannot be refused.",
+          points: [{ to: "remove-from-po", toAt: 0.4 }, { to: "removed-from-po", toAt: 0.85 }] }
+      ]
+    },
+    {
+      name: "Design: adding an assignment to a purchase order",
+      lanes: [
+        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 380 },
+        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 660 },
+        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1100 },
+        { id: "po", label: "purchaseOrder-{id}", component: "purchaseOrder", kind: "entity", y: 1400 }
+      ],
+      messages: [
+        { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "initiated", lane: "assignment", column: 0, title: "Add To Purchase Order Initiated",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "add-assignment", lane: "po-command", column: 0, title: "Add Assignment",
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "client_id", "currency", "user_id?"] },
+        { id: "sent", lane: "assignment", column: 1, title: "Purchase Order Add Assignment Sent",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "refused", lane: "assignment", column: 2, title: "Add To Purchase Order Rejected", rejected: true,
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "reason", "data", "user_id?"] },
+        { id: "assignment-added", lane: "po", column: 0, title: "Assignment Added",
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "client_id", "currency", "user_id?"] },
+        { id: "assignment-rejected", lane: "po", column: 1, title: "Assignment Rejected", rejected: true,
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "reason", "data", "user_id?"] },
+        { id: "added-to-po", lane: "assignment", column: 3, title: "Added To Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "add-to-po-rejected", lane: "assignment", column: 4, title: "Add To Purchase Order Rejected", rejected: true,
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "reason", "data", "user_id?"] }
+      ],
+      links: [
+        { from: "add-to-po", to: "initiated" },
+        { from: "add-to-po", to: "refused", label: "no currency or no client", toAt: 0.3 },
+        { from: "initiated", to: "add-assignment" },
+        { from: "initiated", to: "sent" },
+        { from: "add-assignment", to: "assignment-added" },
+        { from: "add-assignment", to: "assignment-rejected", label: "currency or client differs" },
+        { from: "added-to-po", to: "assignment-added", kind: "reads", fromAt: 0.7 },
+        { from: "add-to-po-rejected", to: "assignment-rejected", kind: "reads", fromAt: 0.9 }
+      ],
+      notes: [
+        { id: "requirements", column: 0.35, y: 20, width: 500, align: "left",
+          text: "currency-and-client-first. An assignment MUST NOT be added to a purchase order before it has a currency and a client.\n\nsame-currency. An assignment MUST be added only to a purchase order that has the same currency.\n\nsame-client. An assignment MUST be added only to a purchase order that has the same client." },
+        { id: "note-1a", column: 1.3, y: 790, width: 300,
+          text: "1a. The assignment records that it is being added, with a new addition id. A second handler sends the request, with the assignment's currency and client, and records that it went.",
+          points: [{ to: "initiated", toAt: 0.85 }, { to: "sent", toAt: 0.4 }, { to: "add-assignment", toAt: 0.85 }] },
+        { id: "note-1b", column: 2, y: 20, width: 240,
+          text: "1b. With no currency, or no client, the assignment refuses at once: no_currency or no_client_id. Nothing goes to the purchase order.",
+          points: [{ to: "refused", toAt: 0.6 }] },
+        { id: "note-2a", column: 0, y: 1640, width: 220,
+          text: "2a. The purchase order adds the assignment when the currencies and the clients are the same.",
+          points: [{ to: "assignment-added", toAt: 0.15 }] },
+        { id: "note-2b", column: 1.3, y: 1640, width: 330,
+          text: "2b. Otherwise it refuses. reason is currency_mismatch or client_mismatch, and data holds the two currencies or the two client ids. The currency is checked first.",
+          points: [{ to: "assignment-rejected", toAt: 0.2 }] },
+        { id: "note-3a", column: 3, y: 20, width: 240,
+          text: "3a. The assignment records the answer, when its addition id is the one that it waits for.",
+          points: [{ to: "added-to-po", toAt: 0.4 }] },
+        { id: "note-3b", column: 4.1, y: 20, width: 280,
+          text: "3b. A refusal is recorded with the purchase order's reason and data. The screen shows why, also for a reason that it does not know.",
+          points: [{ to: "add-to-po-rejected", toAt: 0.5 }] }
+      ]
+    },
+    {
+      name: "An assignment is removed before its request is sent",
+      lanes: [
+        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 380 },
+        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 640 },
+        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1060 }
+      ],
+      messages: [
+        { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "initiated", lane: "assignment", column: 0, title: "Add To Purchase Order Initiated",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "remove-from-po", lane: "assignment-command", column: 1, title: "Remove From Purchase Order",
+          attrs: ["assignment_id", "user_id?"] },
+        { id: "remove-assignment", lane: "po-command", column: 1, title: "Remove Assignment",
+          attrs: ["purchase_order_id", "assignment_id", "user_id?"] },
+        { id: "removed-from-po", lane: "assignment", column: 2, title: "Removed From Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "user_id?"] }
+      ],
+      links: [
+        { from: "add-to-po", to: "initiated" },
+        { from: "remove-from-po", to: "remove-assignment" },
+        { from: "remove-from-po", to: "removed-from-po" }
+      ],
+      notes: [
+        { id: "requirements", column: 0.6, y: 20, width: 560, align: "left",
+          text: "remove. The component MUST let a user remove an assignment from its purchase order, also while it is still being added.\n\nboth-agree. When the flow settles, an assignment MUST be on a purchase order exactly when that purchase order holds the assignment." },
+        { id: "note-1", column: 0, y: 770, width: 240,
+          text: "1. The assignment is being added. The handler that sends the request runs apart from the commands, and reaches this event only after the removal. The addition is then no longer pending, so it sends nothing. If it sent the request, the purchase order would hold an assignment that is on no purchase order.",
+          points: [{ to: "initiated", toAt: 0.5 }] },
+        { id: "note-2", column: 1.6, y: 1200, width: 330,
+          text: "2. A user removes the assignment. The assignment tells the purchase order to remove it, and records the removal, which ends the addition. The purchase order does not hold the assignment, so it ignores Remove Assignment.",
+          points: [{ to: "remove-assignment", toAt: 0.5 }, { to: "removed-from-po", toAt: 0.5 }] }
+      ]
+    },
+    {
+      name: "An assignment is removed after its request is sent",
+      lanes: [
+        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 380 },
+        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 640 },
+        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1060 },
+        { id: "po", label: "purchaseOrder-{id}", component: "purchaseOrder", kind: "entity", y: 1360 }
+      ],
+      messages: [
+        { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "initiated", lane: "assignment", column: 0, title: "Add To Purchase Order Initiated",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "add-assignment", lane: "po-command", column: 0, title: "Add Assignment",
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "client_id", "currency", "user_id?"] },
+        { id: "sent", lane: "assignment", column: 1, title: "Purchase Order Add Assignment Sent",
+          attrs: ["assignment_id", "purchase_order_id", "addition_id", "user_id?"] },
+        { id: "remove-from-po", lane: "assignment-command", column: 2, title: "Remove From Purchase Order",
+          attrs: ["assignment_id", "user_id?"] },
+        { id: "remove-assignment", lane: "po-command", column: 2, title: "Remove Assignment",
+          attrs: ["purchase_order_id", "assignment_id", "user_id?"] },
+        { id: "removed-from-po", lane: "assignment", column: 3, title: "Removed From Purchase Order",
+          attrs: ["assignment_id", "purchase_order_id", "user_id?"] },
+        { id: "assignment-added", lane: "po", column: 0, title: "Assignment Added",
+          attrs: ["purchase_order_id", "assignment_id", "addition_id", "client_id", "currency", "user_id?"] },
+        { id: "assignment-removed", lane: "po", column: 2, title: "Assignment Removed",
+          attrs: ["purchase_order_id", "assignment_id", "user_id?"] }
+      ],
+      links: [
+        { from: "add-to-po", to: "initiated" },
+        { from: "initiated", to: "add-assignment" },
+        { from: "initiated", to: "sent" },
+        { from: "remove-from-po", to: "remove-assignment" },
+        { from: "remove-from-po", to: "removed-from-po" },
+        { from: "add-assignment", to: "assignment-added" },
+        { from: "remove-assignment", to: "assignment-removed" }
+      ],
+      notes: [
+        { id: "requirements", column: 0.6, y: 20, width: 560, align: "left",
+          text: "remove. The component MUST let a user remove an assignment from its purchase order, also while it is still being added.\n\nboth-agree. When the flow settles, an assignment MUST be on a purchase order exactly when that purchase order holds the assignment." },
+        { id: "note-1", column: 1, y: 770, width: 240,
+          text: "1. The assignment is being added, and its request has gone.",
+          points: [{ to: "initiated", toAt: 0.6 }, { to: "sent", toAt: 0.4 }] },
+        { id: "note-2", column: 2.9, y: 20, width: 300,
+          text: "2. A user removes the assignment before the answer. The assignment tells the purchase order to remove it, and records the removal, which ends the addition.",
+          points: [{ to: "remove-from-po", toAt: 0.6 }, { to: "removed-from-po", toAt: 0.85 }] },
+        { id: "note-3", column: 1, y: 1600, width: 420,
+          text: "3. The purchase order takes the two commands in the order in which they were sent: it adds the assignment, then removes it. The assignment ignores Assignment Added, because its addition is no longer pending. Without the addition id, it would record that it is on a purchase order that no longer holds it.",
+          points: [{ to: "assignment-added", toAt: 0.6 }, { to: "assignment-removed", toAt: 0.4 }] }
+      ]
+    }
+  ]
+};
+</script>
+
+<style>
+  /* Layout: a reading column around a wide live canvas; the canvas stays a white sheet in both themes. */
+  :root {
+    --bg: #f3f6f5; --fg: #15201e; --muted: #566562; --line: #d3ddda; --panel: #ffffff;
+    --sheet: #ffffff; --sheet-line: #cdd8d5; --focus: #1c6fe0; --error: #b3342b;
+    --f-sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1413; --fg: #e3ebe9; --muted: #98a9a5; --line: #25312e; --panel: #141c1a;
+      --sheet: #ffffff; --sheet-line: #34423f; --focus: #6aaefc; --error: #f2887e;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1413; --fg: #e3ebe9; --muted: #98a9a5; --line: #25312e; --panel: #141c1a;
+    --sheet: #ffffff; --sheet-line: #34423f; --focus: #6aaefc; --error: #f2887e;
+    color-scheme: dark;
+  }
+
+  [hidden] { display: none !important; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--f-sans); font-size: 16px; line-height: 1.55; }
+  .page { max-width: 1440px; margin: 0 auto; padding-inline: 16px; padding-block: 36px 64px; display: grid; gap: 36px; }
+  .column { max-width: 1120px; display: grid; gap: 12px; }
+  h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  h2 { font-size: 20px; font-weight: 600; margin: 0; text-wrap: balance; }
+  p { margin: 0; max-width: 72ch; }
+  .summary { color: var(--muted); font-size: 17px; }
+  code { font-family: var(--f-mono); font-size: 0.9em; }
+
+  section { display: grid; gap: 12px; }
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .toolbar .spacer { flex: 1 1 24px; }
+  button { font: inherit; font-size: 14px; background: transparent; color: var(--fg); border: 0; border-radius: 3px; padding: 6px 11px; cursor: pointer; box-shadow: inset 0 0 0 1px var(--line); }
+  button.panel-button[aria-pressed="true"] { background: var(--fg); color: var(--bg); box-shadow: none; }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .status { color: var(--muted); font-size: 14px; }
+  .canvas { background: var(--sheet); border: 1px solid var(--sheet-line); border-radius: 4px; height: min(84vh, 1000px); min-height: 520px; overflow: hidden; position: relative; }
+  .load-error { color: var(--error); padding: 20px; margin: 0; }
+
+  ol, ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 80ch; }
+  .legend { color: var(--muted); font-size: 15px; }
+</style>
+
+<main class="page">
+  <header class="column">
+    <h1 id="diagram-title"></h1>
+    <p class="summary" id="diagram-summary"></p>
+  </header>
+
+  <section aria-label="Event flow panels">
+    <div class="toolbar">
+      <span id="panel-buttons" class="toolbar"></span>
+      <span class="spacer"></span>
+      <button type="button" id="copy-clipboard" disabled>Copy for excalidraw.com</button>
+      <button type="button" id="copy-file" disabled>Copy as .excalidraw file</button>
+      <button type="button" id="reset" disabled>Reset the scene</button>
+    </div>
+    <p class="status" id="scene-status" aria-live="polite">Loading Excalidraw…</p>
+    <div class="canvas" id="canvas"></div>
+  </section>
+
+  <section class="column" id="questions-section" aria-labelledby="h-questions" hidden>
+    <h2 id="h-questions">Open questions</h2>
+    <ol id="questions"></ol>
+  </section>
+
+  <section class="column" aria-labelledby="h-legend">
+    <h2 id="h-legend">How to read the panels</h2>
+    <ul class="legend">
+      <li>A lane is a stream. Pale lanes hold commands, solid lanes hold events, and each component has its own colour. Grey dashed lanes are outside the event store.</li>
+      <li>Time runs from left to right.</li>
+      <li>A solid arrow means the handler of this message writes that message.</li>
+      <li>A dashed arrow means a handler reacts to an event. It points at the event that is read.</li>
+      <li>A red title is a rejection. Grey attributes are optional.</li>
+      <li>A name above a grey box is a list. Each entry in the list has the attributes in the box.</li>
+      <li>Blue boxes are numbered notes.</li>
+    </ul>
+  </section>
+</main>
+
+<script>window.EXCALIDRAW_ASSET_PATH = "https://unpkg.com/@excalidraw/excalidraw@0.17.6/dist/";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@excalidraw/excalidraw@0.17.6/dist/excalidraw.production.min.js"></script>
+<script>
+(function () {
+  var D = window.DIAGRAM;
+  var mount = document.getElementById("canvas");
+  var status = document.getElementById("scene-status");
+  var buttons = {
+    clipboard: document.getElementById("copy-clipboard"),
+    file: document.getElementById("copy-file"),
+    reset: document.getElementById("reset")
+  };
+
+  document.getElementById("diagram-title").textContent = D.title;
+  document.getElementById("diagram-summary").textContent = D.summary || "";
+  if (D.questions && D.questions.length) {
+    var list = document.getElementById("questions");
+    D.questions.forEach(function (question) {
+      var item = document.createElement("li");
+      item.textContent = question;
+      list.appendChild(item);
+    });
+    document.getElementById("questions-section").hidden = false;
+  }
+
+  if (!window.React || !window.ReactDOM || !window.ExcalidrawLib) {
+    mount.innerHTML = '<p class="load-error">Excalidraw did not load from unpkg.com, so the panels cannot be shown. Reload the page to try again.</p>';
+    status.textContent = "Excalidraw did not load.";
+    return;
+  }
+  var Lib = window.ExcalidrawLib;
+
+  // Excalidraw font family 2 is Helvetica; its line height is 1.15 of the font size.
+  var FONT_FAMILY = 2;
+  var LINE_HEIGHT = 1.15;
+  var measure = document.createElement("canvas").getContext("2d");
+
+  function textWidth(text, size) {
+    measure.font = size + "px Helvetica, Segoe UI Emoji";
+    return measure.measureText(text).width;
+  }
+
+  function wrap(text, size, maxWidth) {
+    var lines = [];
+    text.split("\n").forEach(function (paragraph) {
+      if (paragraph === "") { lines.push(""); return; }
+      var line = "";
+      paragraph.split(" ").forEach(function (word) {
+        var next = line ? line + " " + word : word;
+        if (line && textWidth(next, size) > maxWidth) { lines.push(line); line = word; }
+        else { line = next; }
+      });
+      lines.push(line);
+    });
+    return lines;
+  }
+
+  var INK = "#1e1e1e", GREY = "#6b7280", RED = "#d92d20", ARROW = "#3b3f46", LABEL = "#52525b";
+  var NOTE_LINE = "#1c6fe0", NOTE_FILL = "#eaf2fe";
+  var LANE_HEIGHT = 46, LANE_LABEL_SIZE = 15;
+  var BOX_WIDTH = 220, BOX_PAD = 14, TITLE_GAP = 10, TITLE_SIZE = 17, ATTR_SIZE = 15;
+  var LIST_INSET = 18, LIST_PAD = 4, LIST_GAP = 6, LIST_LINE = "#a1a1aa", LIST_FILL = "#f4f4f5";
+  var COLUMN_WIDTH = 260, NOTE_PAD = 12, NOTE_SIZE = 15, LINK_LABEL_SIZE = 13;
+  var PANEL_GAP = 260, READS_GAP = 40, READS_STEP = 22;
+
+  var PALETTE = [
+    { fill: "#00c2a8", ink: "#063b34", commandFill: "#d8f7f1", commandStroke: "#35c7ad", commandInk: "#0b5e52" },
+    { fill: "#6db0fc", ink: "#0d2e57", commandFill: "#eaf3ff", commandStroke: "#93bdf2", commandInk: "#1d4f91" },
+    { fill: "#a98bf0", ink: "#24154d", commandFill: "#f3eeff", commandStroke: "#b9a3ec", commandInk: "#4a2f91" },
+    { fill: "#f5a54a", ink: "#432604", commandFill: "#fff2e2", commandStroke: "#f2b36b", commandInk: "#7a4a10" }
+  ];
+  var OUTSIDE = { fill: "#f4f4f5", stroke: "#a1a1aa", ink: "#3f3f46", dashed: true };
+
+  var componentColours = {};
+  function laneColours(lane) {
+    if (lane.kind === "outside") return OUTSIDE;
+    if (!componentColours[lane.component]) {
+      componentColours[lane.component] = PALETTE[Object.keys(componentColours).length % PALETTE.length];
+    }
+    var c = componentColours[lane.component];
+    return lane.kind === "command"
+      ? { fill: c.commandFill, stroke: c.commandStroke, ink: c.commandInk, dashed: false }
+      : { fill: c.fill, stroke: c.fill, ink: c.ink, dashed: false };
+  }
+
+  function at(b, side, t) {
+    if (t === undefined) t = 0.5;
+    if (side === "top") return [b.x + b.w * t, b.y];
+    if (side === "bottom") return [b.x + b.w * t, b.y + b.h];
+    if (side === "left") return [b.x, b.y + b.h * t];
+    return [b.x + b.w, b.y + b.h * t];
+  }
+
+  function facingSides(from, to) {
+    if (to.y >= from.y + from.h) return ["bottom", "top"];
+    if (to.y + to.h <= from.y) return ["top", "bottom"];
+    return to.x >= from.x ? ["right", "left"] : ["left", "right"];
+  }
+
+  function elbow(start, end, side) {
+    if (start[0] === end[0] || start[1] === end[1]) return [start, end];
+    if (side === "top" || side === "bottom") {
+      var midY = (start[1] + end[1]) / 2;
+      return [start, [start[0], midY], [end[0], midY], end];
+    }
+    var midX = (start[0] + end[0]) / 2;
+    return [start, [midX, start[1]], [midX, end[1]], end];
+  }
+
+  // A message's attributes in the model's order: "name", "name?" when optional,
+  // or { list: ["part", "part?"] } for a list of entries.
+  function attributeBlocks(attrs) {
+    var attribute = function (text) { return { text: text.replace(/\?$/, ""), optional: /\?$/.test(text) }; };
+    return attrs.map(function (a) {
+      if (typeof a === "string") return attribute(a);
+      var name = Object.keys(a)[0];
+      return { list: name, parts: a[name].map(attribute) };
+    });
+  }
+
+  function attributesHeight(blocks) {
+    var line = ATTR_SIZE * LINE_HEIGHT;
+    return blocks.reduce(function (height, b) {
+      return height + line + (b.list ? LIST_GAP * 2 + LIST_PAD * 2 + b.parts.length * line : 0);
+    }, 0);
+  }
+
+  function buildScene() {
+    var skeleton = [];
+    var centred = [];
+    var routes = [];
+    var frames = [];
+    var top = 0;
+
+    D.panels.forEach(function (panel, panelIndex) {
+      var prefix = "p" + panelIndex + "-";
+      var panelIds = [];
+      var box = {};
+      var add = function (element) { skeleton.push(element); panelIds.push(element.id); };
+
+      var labelWidth = Math.max.apply(null, panel.lanes.map(function (lane) {
+        return textWidth(lane.label, LANE_LABEL_SIZE);
+      })) + 36;
+      var columnWidth = panel.columnWidth || COLUMN_WIDTH;
+      var centreX = function (column) { return labelWidth + BOX_WIDTH / 2 + 30 + column * columnWidth; };
+      var laneById = {};
+      panel.lanes.forEach(function (lane) { laneById[lane.id] = lane; });
+
+      var right = Math.max.apply(null,
+        panel.messages.map(function (m) { return centreX(m.column) + BOX_WIDTH / 2; })
+          .concat((panel.notes || []).map(function (n) { return centreX(n.column) + n.width / 2; }))) + 40;
+
+      panel.lanes.forEach(function (lane) {
+        var colours = laneColours(lane);
+        var id = prefix + "lane-" + lane.id;
+        var group = [id];
+        add({ type: "rectangle", id: id, x: 0, y: top + lane.y - LANE_HEIGHT / 2, width: right, height: LANE_HEIGHT,
+          strokeColor: colours.stroke, backgroundColor: colours.fill, fillStyle: "solid", strokeWidth: 1,
+          strokeStyle: colours.dashed ? "dashed" : "solid", roughness: 0, roundness: null, groupIds: group, locked: true });
+        add({ type: "text", id: id + "-label", x: 12, y: top + lane.y - (LANE_LABEL_SIZE * LINE_HEIGHT) / 2,
+          text: lane.label, fontSize: LANE_LABEL_SIZE, fontFamily: FONT_FAMILY, strokeColor: colours.ink,
+          groupIds: group, locked: true });
+      });
+
+      panel.messages.forEach(function (m) {
+        var lane = laneById[m.lane];
+        if (!lane) throw new Error("Message " + m.id + " names lane " + m.lane + ", which the panel does not have");
+        var cx = centreX(m.column);
+        var blocks = attributeBlocks(m.attrs);
+        var title = wrap(m.title, TITLE_SIZE, BOX_WIDTH - 24);
+        var height = BOX_PAD * 2 + title.length * TITLE_SIZE * LINE_HEIGHT + TITLE_GAP + attributesHeight(blocks);
+        var id = prefix + m.id;
+        var group = [id];
+        box[m.id] = { id: id, x: cx - BOX_WIDTH / 2, y: top + lane.y - height / 2, w: BOX_WIDTH, h: height };
+        add({ type: "rectangle", id: id, x: box[m.id].x, y: box[m.id].y, width: BOX_WIDTH, height: height,
+          strokeColor: INK, backgroundColor: "#ffffff", fillStyle: "solid", strokeWidth: 2,
+          roughness: 0, roundness: null, groupIds: group });
+
+        var textY = box[m.id].y + BOX_PAD;
+        add({ type: "text", id: id + "-title", x: box[m.id].x, y: textY, text: title.join("\n"),
+          fontSize: TITLE_SIZE, fontFamily: FONT_FAMILY, textAlign: "center", strokeColor: m.rejected ? RED : INK,
+          groupIds: group });
+        centred.push({ id: id + "-title", cx: cx });
+        textY += title.length * TITLE_SIZE * LINE_HEIGHT + TITLE_GAP;
+
+        // Consecutive lines of one colour share a text element.
+        var line = ATTR_SIZE * LINE_HEIGHT, run = null, runs = 0;
+        var flush = function () {
+          if (!run) return;
+          var textId = id + "-attrs-" + runs++;
+          add({ type: "text", id: textId, x: box[m.id].x, y: run.y, text: run.lines.join("\n"), fontSize: ATTR_SIZE,
+            fontFamily: FONT_FAMILY, textAlign: "center", strokeColor: run.colour, groupIds: group });
+          centred.push({ id: textId, cx: cx });
+          run = null;
+        };
+        var write = function (a) {
+          var colour = a.optional ? GREY : INK;
+          if (!run || run.colour !== colour) { flush(); run = { y: textY, colour: colour, lines: [] }; }
+          run.lines.push(a.text);
+          textY += line;
+        };
+        blocks.forEach(function (b) {
+          if (!b.list) { write(b); return; }
+          flush();
+          textY += LIST_GAP;
+          write({ text: b.list });
+          flush();
+          // The list's box goes in before its parts, so that its fill sits under them.
+          add({ type: "rectangle", id: id + "-list-" + b.list, x: box[m.id].x + LIST_INSET, y: textY,
+            width: BOX_WIDTH - LIST_INSET * 2, height: LIST_PAD * 2 + b.parts.length * line,
+            strokeColor: LIST_LINE, backgroundColor: LIST_FILL, fillStyle: "solid", strokeWidth: 1,
+            roughness: 0, roundness: null, groupIds: group });
+          textY += LIST_PAD;
+          b.parts.forEach(write);
+          flush();
+          textY += LIST_PAD + LIST_GAP;
+        });
+        flush();
+      });
+
+      (panel.notes || []).forEach(function (n) {
+        var lines = wrap(n.text, NOTE_SIZE, n.width - NOTE_PAD * 2);
+        var height = NOTE_PAD * 2 + lines.length * NOTE_SIZE * LINE_HEIGHT;
+        var id = prefix + n.id;
+        var group = [id];
+        box[n.id] = { id: id, x: centreX(n.column) - n.width / 2, y: top + n.y, w: n.width, h: height };
+        add({ type: "rectangle", id: id, x: box[n.id].x, y: box[n.id].y, width: n.width, height: height,
+          strokeColor: NOTE_LINE, backgroundColor: NOTE_FILL, fillStyle: "solid", strokeWidth: 1, roughness: 0,
+          roundness: null, groupIds: group });
+        add({ type: "text", id: id + "-text", x: box[n.id].x + NOTE_PAD, y: box[n.id].y + NOTE_PAD,
+          text: lines.join("\n"), fontSize: NOTE_SIZE, fontFamily: FONT_FAMILY, textAlign: n.align || "center",
+          strokeColor: INK, groupIds: group });
+        if (n.align !== "left") centred.push({ id: id + "-text", cx: box[n.id].x + n.width / 2 });
+      });
+
+      var messageBottom = Math.max.apply(null, panel.messages.map(function (m) { return box[m.id].y + box[m.id].h; }));
+      var readsCount = 0;
+      var arrows = [];
+
+      (panel.links || []).forEach(function (link, linkIndex) {
+        var from = box[link.from], to = box[link.to];
+        if (!from || !to) throw new Error("A link in " + panel.name + " names " + (from ? link.to : link.from) + ", which the panel does not have");
+        var reads = link.kind === "reads";
+        var sides = reads ? ["bottom", "bottom"] : facingSides(from, to);
+        var fromSide = link.fromSide || sides[0], toSide = link.toSide || sides[1];
+        var start = at(from, fromSide, link.fromAt), end = at(to, toSide, link.toAt);
+        var bend = link.bend !== undefined ? top + link.bend
+          : (reads && fromSide === "bottom" && toSide === "bottom") ? messageBottom + READS_GAP + READS_STEP * readsCount++ : null;
+        var points = bend !== null ? [start, [start[0], bend], [end[0], bend], end] : elbow(start, end, fromSide);
+        arrows.push({ id: prefix + "link-" + linkIndex, from: from.id, to: to.id, points: points,
+          dashed: reads, colour: ARROW, label: link.label });
+      });
+
+      (panel.notes || []).forEach(function (n) {
+        (n.points || []).forEach(function (p, pointIndex) {
+          var from = box[n.id], to = box[p.to];
+          if (!to) throw new Error("Note " + n.id + " points at " + p.to + ", which the panel does not have");
+          var sides = facingSides(from, to);
+          var start = at(from, p.fromSide || sides[0], p.fromAt);
+          var end = at(to, p.toSide || sides[1], p.toAt);
+          arrows.push({ id: prefix + n.id + "-point-" + pointIndex, from: from.id, to: to.id,
+            points: [start, end], dashed: false, colour: NOTE_LINE });
+        });
+      });
+
+      arrows.forEach(function (a) {
+        add({ type: "arrow", id: a.id, x: a.points[0][0], y: a.points[0][1], start: { id: a.from }, end: { id: a.to },
+          strokeColor: a.colour, strokeWidth: 1, strokeStyle: a.dashed ? "dashed" : "solid", roughness: 0,
+          roundness: null, startArrowhead: null, endArrowhead: "triangle" });
+        routes.push(a);
+        if (a.label) {
+          var middle = Math.floor((a.points.length - 1) / 2);
+          var p0 = a.points[middle], p1 = a.points[middle + 1];
+          var horizontal = p0[1] === p1[1];
+          add({ type: "text", id: a.id + "-label", x: (p0[0] + p1[0]) / 2 - (horizontal ? textWidth(a.label, LINK_LABEL_SIZE) / 2 : textWidth(a.label, LINK_LABEL_SIZE) + 8),
+            y: (p0[1] + p1[1]) / 2 - (horizontal ? LINK_LABEL_SIZE * LINE_HEIGHT + 4 : LINK_LABEL_SIZE * LINE_HEIGHT / 2),
+            text: a.label, fontSize: LINK_LABEL_SIZE, fontFamily: FONT_FAMILY, strokeColor: LABEL });
+        }
+      });
+
+      var bottom = Math.max.apply(null, Object.keys(box).map(function (key) { return box[key].y + box[key].h; })
+        .concat(routes.map(function (r) { return Math.max.apply(null, r.points.map(function (p) { return p[1]; })); })));
+      var frameId = prefix + "frame";
+      skeleton.push({ type: "frame", id: frameId, name: panel.name, children: panelIds });
+      frames.push({ id: frameId, name: panel.name });
+      top = bottom + PANEL_GAP;
+    });
+
+    var elements = Lib.convertToExcalidrawElements(skeleton, { regenerateIds: false });
+    var byId = {};
+    elements.forEach(function (el) { byId[el.id] = el; });
+
+    centred.forEach(function (c) { byId[c.id].x = c.cx - byId[c.id].width / 2; });
+
+    // The converter routes bound arrows as straight lines; set the computed routes, keeping the bindings.
+    routes.forEach(function (r) {
+      var el = byId[r.id];
+      var origin = r.points[0];
+      var points = r.points.map(function (p) { return [p[0] - origin[0], p[1] - origin[1]]; });
+      var xs = points.map(function (p) { return p[0]; });
+      var ys = points.map(function (p) { return p[1]; });
+      el.x = origin[0];
+      el.y = origin[1];
+      el.points = points;
+      el.width = Math.max.apply(null, xs) - Math.min.apply(null, xs);
+      el.height = Math.max.apply(null, ys) - Math.min.apply(null, ys);
+      el.roundness = null;
+    });
+
+    return { elements: elements, frames: frames };
+  }
+
+  var api = null;
+  var panelButtons = [];
+
+  function showPanel(index) {
+    if (!api) return;
+    var frame = api.getSceneElements().filter(function (el) { return el.type === "frame"; })[index];
+    if (frame) api.scrollToContent(frame, { fitToViewport: true, viewportZoomFactor: 0.92 });
+    panelButtons.forEach(function (button, i) { button.setAttribute("aria-pressed", String(i === index)); });
+  }
+
+  function copy(text, label) {
+    var refused = function () { status.textContent = "The browser refused the copy. Try again from a normal browser tab."; };
+    try {
+      navigator.clipboard.writeText(text).then(function () { status.textContent = label + " copied."; }, refused);
+    } catch (e) {
+      refused();
+    }
+  }
+
+  var scene;
+  try {
+    scene = buildScene();
+  } catch (e) {
+    mount.innerHTML = '<p class="load-error"></p>';
+    mount.firstChild.textContent = "The panels could not be drawn: " + (e && e.message || e);
+    status.textContent = "The panels could not be drawn.";
+    return;
+  }
+
+  var buttonRow = document.getElementById("panel-buttons");
+  scene.frames.forEach(function (frame, index) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "panel-button";
+    button.textContent = frame.name;
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", function () { showPanel(index); });
+    buttonRow.appendChild(button);
+    panelButtons.push(button);
+  });
+
+  buttons.clipboard.addEventListener("click", function () {
+    if (!api) return;
+    copy(JSON.stringify({ type: "excalidraw/clipboard", elements: api.getSceneElements(), files: api.getFiles() }), "Elements");
+  });
+  buttons.file.addEventListener("click", function () {
+    if (!api) return;
+    copy(Lib.serializeAsJSON(api.getSceneElements(), api.getAppState(), api.getFiles(), "local"), "File");
+  });
+  buttons.reset.addEventListener("click", function () {
+    if (!api) return;
+    api.updateScene({ elements: buildScene().elements });
+    showPanel(0);
+    status.textContent = "Scene reset.";
+  });
+
+  ReactDOM.createRoot(mount).render(React.createElement(Lib.Excalidraw, {
+    initialData: {
+      elements: scene.elements,
+      appState: { viewBackgroundColor: "#ffffff", currentItemFontFamily: FONT_FAMILY, currentItemRoughness: 0 }
+    },
+    theme: "light",
+    UIOptions: {
+      canvasActions: { loadScene: false, saveToActiveFile: false, export: false, saveAsImage: false, toggleTheme: false }
+    },
+    excalidrawAPI: function (instance) {
+      if (api || !instance) return;
+      api = instance;
+      buttons.clipboard.disabled = false;
+      buttons.file.disabled = false;
+      buttons.reset.disabled = false;
+      status.textContent = "Live. Pick a panel above, drag boxes, or zoom with Cmd and the scroll wheel.";
+      setTimeout(function () { showPanel(0); }, 60);
+    }
+  }));
+})();
+</script>
