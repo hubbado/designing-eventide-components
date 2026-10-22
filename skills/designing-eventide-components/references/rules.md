@@ -16,6 +16,7 @@ model, and when you walk the scenarios.
   - Every handler is idempotent, and the model says how
 - Messages
   - Name messages in plain business words
+  - Say what is true now, in the words that people use
   - Name attributes within their message
   - A message carries its context
   - A command acts on the entity's current state
@@ -281,6 +282,37 @@ uses. If no plain word fits, keep the name, and say why in a comment. If no
 name fits at all, look at the design first: separate what the message
 combines, or make clear what it does. When one round of names fails, do not
 offer another. Say that no name fits, and ask what the message combines.
+
+### Say what is true now, in the words that people use
+
+A design reads its streams as records, and its words drift into the words of
+records: "a start", "an end", "the agreement has a start that is not
+cancelled". Then a word such as *started* has two meanings: that the stream
+holds a `Started` event, and that the thing is running now. People use it only
+in the second meaning. An engine that was started and then turned off is not
+started, and nobody refuses to start it because it is "already started". So an
+agreement that has ended is not started.
+
+- A word for a state, such as started, ended, in force, open or closed, means
+  the state now.
+- A rule that depends on history says so, with words for history: "has been
+  started", "was in force on 3 Oct", "has never started".
+- A refusal reason says what stands in the way, as you would say it to the
+  person who sent the command: `already_started`, `already_ended`,
+  `not_after_last_end_date`. A negation is correct when it is what a person
+  says. A reason is not the model's condition made shorter: one design's
+  refusal `not_ended` was "the latest active start has no end" made shorter,
+  and it became `already_started`.
+- The `when` conditions use the same words, because the reasons, the code and
+  the screens are written from them.
+
+**Why:** a word with two meanings makes each reader choose one. The code, the
+screens and the messages that a person sees are then written from different
+meanings, and nobody notices until a reader asks what the word means.
+
+**In the model:** read each condition, ignore and reason aloud, as you would
+say it to the operator about the thing now. Where a word for a state means
+"the stream holds this event", say the state, or mark the history.
 
 ### Name attributes within their message
 
