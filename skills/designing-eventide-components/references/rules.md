@@ -329,6 +329,13 @@ terms that a payment used stay as they were when the terms change later. A
 teacher's limit of 25 students for this term's class stays 25 when it rises
 to 30 next term.
 
+A command that carries its own id names a process with it. Each event that the
+command causes, a refusal too, carries that id, so that a reader can follow the
+process from the command to each of its events. In the purchase order example,
+`addition_id` goes through `AddToPurchaseOrderInitiated`,
+`PurchaseOrderAddAssignmentSent`, the purchase order's `AssignmentAdded`, and
+`AddedToPurchaseOrder`.
+
 **Why:** a message that carries only an id acts as the parameters of one call.
 A consumer that cannot act on it alone must keep a copy of the earlier event's
 state, or read another component's store. One model kept a stream for each
