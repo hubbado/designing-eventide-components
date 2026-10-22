@@ -165,24 +165,22 @@ add an entry to the change log.
 Some scenarios later become interactive tests: they run against the live
 components, and a person inspects their output.
 
-**Think of it on paper.** Before you reach for a protocol, picture the process
-done by people on paper, between desks and departments. Many processes were
-never done on paper, and a design does not have to copy how paper did it. The
-picture is a way to think: paper has no locks, no compensating transactions,
-and no way to read another department's files, so it shows how to deal with a
-race, or with the coordination of two parties, without machinery. A clerk
-pays an invoice while another department decides to void it. The clerk acts
-on the document in hand, the correction comes forward as a new document, such
-as an adjustment or a credit note, that the next run picks up, and a
-reconciliation finds the differences. A design can often use the same
-answer: a void that arrives after a payment becomes a deduction from the next
-payment.
+**Think of it as a manual process.** Before you reach for a protocol, picture
+the process done by hand, by people in a physical world, between desks and
+departments. Many processes were never done by hand, and a design does not
+have to copy a manual one. The picture is a way to think about races and
+coordination, because in a physical world each kind of coordination has a
+cost that you can see. A two-phase hold is a phone call to the other
+department before every payment, and a wait for the answer. A compensating
+event is asking for money back that has already left. A read of another
+component's store is walking into another department to read its files.
 
-The picture also shows the cost of each alternative. A two-phase hold is a
-phone call to the other department before every payment, and a wait for the
-answer. A compensating event is asking for money back that has already left.
-A read of another component's store is walking into another department to
-read its files.
+Against those costs, the cheap answers are easy to see. A clerk pays an
+invoice while another department decides to void it. The clerk acts on the
+document in hand, the correction comes forward as a new document, such as an
+adjustment or a credit note, that the next run picks up, and a reconciliation
+finds the differences. A design can often use the same answer: a void that
+arrives after a payment becomes a deduction from the next payment.
 
 ### 4. Present, only when the reviewer asks
 
