@@ -17,10 +17,10 @@ written.
 
 - The first scenario is the usual case from start to finish. A reader who
   reads only it knows what the component does. It is also the overview panel.
-  In the purchase order example: a purchase order is created, an assignment
-  gets the same currency and client, the assignment is added, and later it is
-  removed. It has no refusals and nothing out of the usual order. It tries to
-  break nothing, so it has no Tests.
+  It has no corrections, no refusals and nothing out of the usual order. It
+  tries to break nothing, so it has no Tests. In the purchase order example: a
+  purchase order is created, an assignment gets the same currency and client,
+  the assignment is added, and later it is removed.
 - Each later scenario adds what the reader needs next: first the common
   variations, then the detail of each area, the corrections, the refusals and
   the rare cases.
@@ -60,7 +60,8 @@ It has, in this order:
   ```
 
   - The steps are in time order. Each step is a message that is written, sent
-    or received.
+    or received. A step left in the notes reads as missing, or as out of
+    order.
   - The table starts from empty streams. Every message that the walk needs is
     a step, the setup as well as the story, such as the creation of each
     entity and its first settings. Do not leave a premise in a note because it

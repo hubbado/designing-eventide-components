@@ -6,10 +6,11 @@ Write and check the model first. Draw only when the reviewer asks.
 ## Why this format
 
 A reader of streams thinks in lanes that stay where they are, with time running
-from left to right. A sequence diagram puts the streams in an order that is
-too different from that. A tool that lays out a diagram by itself, such as
-Mermaid's flowchart, moves the lanes where it wants, so time does not run from
-left to right. Excalidraw lets the template place each lane and each column.
+from left to right. A sequence diagram was too different from how such a
+reader thinks about streams. A flowchart was closer, but a tool that lays out
+a diagram by itself, such as Mermaid, moves the lanes where it wants, so time
+does not run from left to right. Excalidraw lets the template place each lane
+and each column.
 
 ## The notation
 

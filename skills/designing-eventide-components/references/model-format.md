@@ -7,7 +7,8 @@ component only. It holds no requirements, and no link from a requirement to a
 handler that enforces it, such as `enforced_by`: a handler only reads, acts,
 writes and refuses to write, so the walks, not a link, show that the flow
 keeps a requirement. The application's requirements are not modelled in it;
-they are tested when they are built. The example is
+they are tested when they are built, by specs and interactive tests. The
+example is
 [examples/purchase-orders/event-flows.yaml](../examples/purchase-orders/event-flows.yaml).
 
 The top level:

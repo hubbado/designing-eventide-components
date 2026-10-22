@@ -5,12 +5,14 @@ reason. Apply them when you sketch candidate models, when you write the
 model, and when you walk the scenarios. Where the project's overlay changes a
 rule, the overlay wins for that project.
 
-When a review teaches a new rule, write it in the project's overlay, in the
-form used here: the rule, **Why**, and **In the model**. Write it for a reader
-who designs another component and has never seen the design that taught it.
-Use general nouns, such as an entity, a document or a start time, or explain
-each noun in its sentence. A rule that holds for every Eventide design can be
-proposed to this skill.
+When a review or an incident teaches a new rule, write it in the project's
+overlay, in the form used here: the rule, **Why**, and **In the model**, with
+a **Source** that names the change log entry or the incident that taught it,
+instead of retelling its details. Write it for a reader who designs another
+component and has never seen the design that taught it. Use general nouns,
+such as an entity, a document or a start time, or explain each noun in its
+sentence. A rule that holds for every Eventide design can be proposed to this
+skill, without its Source.
 
 ## Contents
 
@@ -58,12 +60,18 @@ proposed to this skill.
   records a fact decided outside the component, such as a payment made in
   another system, starts with `Record`, because the component is not the
   authority for that fact.
-- **Rejections.** A domain failure is an event, not an exception. An outcome
-  that the business expects, such as a refused request or an external
-  system's refusal, is recorded as an event that lists its reasons, so that
-  the sender or the screen can react to it. A fault of the infrastructure,
-  such as a lost database connection, raises, and the consumer retries the
-  message.
+- **Rejections.** A handler that refuses a command, from the entity's state,
+  writes a rejection: an event that lists its reasons, so that the sender or
+  the screen can react to it.
+- **Domain failures.** A domain failure is an event, not an exception. When an
+  action outside the store fails in a way that the business expects, such as
+  an external system that refuses a stale code, the handler records it as an
+  event, such as `AuthorizationFailed`, and goes on. An error of the external
+  system's adapter becomes such an event. A fault of the infrastructure, such
+  as a lost network or database connection, raises, and the consumer retries
+  the message. A handler that raises on a domain failure stops its consumer,
+  and the consumer must keep running to handle the retry that the person
+  sends next.
 - **Handlers.** A handler reads messages, takes actions, writes messages,
   and refuses to write them. For each one, write what it reads (the message
   that it handles, and its entity), what actions it takes outside the store,
@@ -298,8 +306,9 @@ the name of the entity that it identifies, such as `invoice_id`, never a bare
 command. Most commands do not need it. A command carries `time` when the
 fact's time differs from the time at which it is processed and a consumer of
 the event needs it: an import of history written today for actions taken
-months ago, or an effective date that a back office enters later.
-`processed_time` is the time at which the handler wrote the event, from the
+months ago, or an effective date that a back office enters later. Say why in
+a comment on the command. `processed_time` is the time at which the handler
+wrote the event, from the
 clock, and an event carries it only when the business needs to know it.
 Message DB records when it wrote each message in any case.
 
@@ -317,9 +326,13 @@ that one consumer needs. An attribute shaped for one consumer is the same
 narrow message from the other side.
 
 The attributes of the message's own fact are another matter: each one needs a
-reader. Ask what reads it. If nothing does, it does not exist yet. The context
-of the thing that changed comes whole, also the parts that no reader uses
-today: a `Voided` carries all the attributes of the `Issued` before it.
+reader. Ask what reads it. If nothing does, it does not exist yet. Ask it also
+of each attribute that a design document proposes, before you copy it: a
+free-text `reason` on a command that nothing reads is an audit string, and it
+goes; a `reason` that names a value of the domain, which a handler reads,
+stays. The context of the thing that changed comes whole, also the parts that
+no reader uses today: a `Voided` carries all the attributes of the `Issued`
+before it.
 
 The same holds for a value that an entity or event copies from somewhere else.
 Ask: when the source changes, must the copy change too? If it must, it is one
@@ -616,7 +629,8 @@ through it, and nothing recorded is ever taken back.
 handler wrote, say so in the model's `questions`, and record the concern in
 the design document's Open.
 
-**Ways that complexity has been reduced:**
+**Ways that complexity has been reduced.** When a design finds a new way, add
+it to the project's overlay in the same form, and propose it to this skill.
 
 - **Let the entity that acts be bounded by what is recorded.** Record facts
   generously, and let a later decision, made by the entity that acts, choose
@@ -694,7 +708,9 @@ so that the model never shows a new name with an old shape.
 document kept an old term for a later rewrite, after a decision had replaced
 it. The next reader used the old term in a proposal to the reviewer, who had
 to correct it. A question asked in an old term can also get an answer about
-the old thing.
+the old thing. A design that kept a renamed command's old name in its model
+also hid the reason for the rename: the new name gave the command's undo a
+noun.
 
 **In the requirements and the model:** before you commit a decision that
 changes a term, search the design's folder and the project's guides for the

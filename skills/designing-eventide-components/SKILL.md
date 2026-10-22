@@ -103,13 +103,15 @@ Read `references/rules.md` and `references/model-format.md`.
   does not decide.
 - Select one, and write the model only for it. Record the choice in the
   design document's "Model selected". Record the candidates, the table, and
-  each candidate that you dismiss, with why and when, in the change log.
+  each candidate that you dismiss, with why and when, in the change log. The
+  selected model can look obvious afterwards; the record shows why it is not.
 - Before you propose a model, a rule or a name, read the change log for
   options already rejected. A rejected option comes back only when its reason
   no longer holds, and the proposal says which reason changed.
 - When a decision changes a fact, or the scope narrows, search the change log
   for the decisions and rejections whose reasons rest on it, and test them
-  again before you build on them.
+  again before you build on them. For example, a time zone on each start
+  outlived its reason when the scope narrowed to one country.
 - When a decision makes the design simpler, "this is simpler if that", record
   it at once (the rule "Record every 'simpler if' decision").
 - Write the whole component design in one model: every stream, message and
@@ -121,7 +123,7 @@ Read `references/rules.md` and `references/model-format.md`.
 Read `references/scenarios-format.md`.
 
 Invent scenarios that could break a requirement, and walk each one through
-the model. Start with the usual case, and make them harder: a message
+the model. Start with the simplest case, and make them harder: a message
 delivered twice; two requests at the same time; a second request before the
 first completes; messages that arrive in a different order; a reply to a
 request that was replaced; a fact that arrives after the decision that it
@@ -151,8 +153,8 @@ in this order:
   shelf went out of date, because nobody ever claimed one.
 - Then choose: remove it by changing the design so that it cannot happen;
   guard it; detect it and correct it forward; or accept it, and name the
-  escape hatch. If the choice changes what a requirement promises, the
-  reviewer changes its words with the business.
+  escape hatch. If the choice changes what a requirement promises, change its
+  words with the business, and have the reviewer agree them.
 
 When a walk shows that a requirement needs two streams to agree, look at the
 stream keys again before you add a protocol. A rule inside one stream is
@@ -235,13 +237,15 @@ Read the model and the scenarios against this list, item by item:
 
 After a large set of walks, or a change to the model, a new session walks
 every scenario again against this list, from the documents alone. It is not a
-continuation of the design session, and it is given no conclusions from it:
-the author's own walk carries the author's assumptions. If your agent can
-start a sub-agent with a fresh context, use one; if not, ask the reviewer to
-start a new session. Check each finding against the documents before you act
-on it, because a finding can be a misreading.
+continuation of the design session, and it is given no conclusions from it.
+The author's own walk carries the author's assumptions, and a check that the
+text agrees with the model does not check that the requirements hold. If your
+agent can start a sub-agent with a fresh context, use one; if not, ask the
+reviewer to start a new session. Check each finding against the documents
+before you act on it, because a finding can be a misreading.
 
 Corrections made in one pass from a walk's findings get a walk of their own,
 or a check of each correction against the files, before they are committed.
-Such a pass changes many places at once, and nothing else checks it. Cite a
-change log entry by its real file name.
+Such a pass changes many places at once, and nothing else checks it: one such
+pass put a wrong date in the text, and another cited a change log entry by a
+guessed name. Cite a change log entry by its real file name.
