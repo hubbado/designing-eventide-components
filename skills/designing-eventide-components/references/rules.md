@@ -11,6 +11,7 @@ model, and when you walk the scenarios.
   - A component never reads another component's store
   - A handler decides from the one thing that it writes
   - Reason about the entity, not about stream positions
+  - An entity takes a recorded value from its event
   - A component holds its state in streams, not in an SQL database
   - A version-gated row takes updates from one category only
   - Every handler is idempotent, and the model says how
@@ -147,6 +148,25 @@ already taken. So in a scenario walk, ask "what does the entity look like when
 the handler fetches it?", not "what has the consumer seen at this position?".
 Across components, ask what has arrived in your own entity or read model. That
 can lag.
+
+### An entity takes a recorded value from its event
+
+When an event records a value that a handler calculated, such as a total, the
+projection takes the value from that event. It does not calculate it again
+from other values in the stream. A projection calculates only a value that no
+event records, and only until an event records it.
+
+**Why:** the recorded value is the fact, and a second calculation can give
+another result. In one design, a document's entity calculated its totals from
+its lines, and did not apply the totals that its issued event recorded. For
+documents whose lines were in an older event that the projection no longer
+applied, the entity had totals of zero, while the issued event held the
+correct totals. A void that copied the document's details from the entity
+would have recorded the zeros.
+
+**In the model:** when a handler `reads` a value that an event records, the
+stream's comment names that event. For a value that no event records, the
+comment says what the entity calculates it from.
 
 ### A component holds its state in streams, not in an SQL database
 
