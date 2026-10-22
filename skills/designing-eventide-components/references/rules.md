@@ -9,7 +9,7 @@ model, and when you walk the scenarios.
 - The parts of a design
 - Streams, stores and state
   - A component never reads another component's store
-  - A component that others depend on knows none of their processes
+  - Afferent components take commands, and efferent components orchestrate them
   - A handler decides from the one thing that it writes
   - Reason about the entity, not about stream positions
   - An entity takes a recorded value from its event
@@ -115,22 +115,32 @@ decision needs data that another component owns, a scenario must show where
 that data arrived: an earlier step in which a handler of this component
 received the other component's event, or a command that carries the data.
 
-### A component that others depend on knows none of their processes
+### Afferent components take commands, and efferent components orchestrate them
 
 A component's afferent couplings are the components that depend on it. Its
 efferent couplings are the components that it depends on. A component depends
-on another when it sends that component a command or handles its events,
+on another when it sends that component commands or handles its events,
 because it must know that component's messages. The model shows each
 coupling, in the handlers' `handles` and `sends`.
 
-Decide the components from the model and its walks, not before the process is
-understood. Then look for a process inside a component that other processes
-use. Its signs are messages, attributes or state that only one of the
-component's users needs: an attribute that every other sender leaves empty,
-state that follows one sender's requests, or commands and events that exist
-for one process only. Such a process belongs in a component of its own, with
-an efferent coupling to the component that it uses. That component then has
-an afferent coupling to it, and knows nothing of it.
+A component is afferent when many processes need to change its state. A
+change to it can reach every component that depends on it, so it is hard to
+change. Keep change in it to a minimum. It takes commands: each process that
+needs it sends it commands and handles its events, so a new process needs no
+change in it. It does not handle the events of the components that depend on
+it. It holds no message, attribute or state that only one of its users needs,
+such as an attribute that every other sender leaves empty.
+
+A component is efferent when it depends on many components, and few or none
+depend on it. It costs little to change. It tends to be an orchestrator: it
+sends commands to afferent components and handles their events. Put a
+process, and the state and guards that it needs, in an efferent component,
+where change is cheap.
+
+Which components are afferent is a fact of the business: how many processes
+change a thing, now and later. One design's requirements often name only one
+of them. So ask the reviewer about the future while you write the requirements,
+and record the answers in the design document's "Other users".
 
 **Why:** a design put the transfer of money between two accounts in the
 account stream, with no stream for the transfer. The account then had
@@ -140,10 +150,10 @@ so that a deposit from another sender could not end a transfer. Every other
 process that moves money in or out of an account would add the same to the
 account.
 
-**In the model:** write each stream's `component` when you write the model,
-and read the couplings again after the walks. Put each component boundary to
-the reviewer in `questions`, with the couplings and the signs that support
-it.
+**In the model:** leave out the `component` of a new stream until the walks
+are done. Then group the streams into components by this rule, and put each
+component, afferent or efferent, to the reviewer in `questions`, with the
+couplings that support it.
 
 ### A handler decides from the one thing that it writes
 

@@ -80,9 +80,14 @@ streams:
     attributes: [invoice_id, supplier_id, { line_items: [worker_id, net_amount] }, user_id]
     proposed: [supplier_id, line_items]
   ```
+- `component` names the component that holds the stream. For a new stream,
+  leave it out until the walks are done, and then decide it ("Afferent
+  components take commands, and efferent components orchestrate them" in
+  [rules.md](rules.md)). An `existing` stream has its component from the
+  start.
 - The order of `streams` is the order of the lanes in every panel. Put the
-  component that starts the flow first, and keep each component's streams
-  together.
+  stream that starts the flow first. When the components are decided, keep
+  each component's streams together.
 - Refer to a message by its name. Where two streams have a message with the
   same name, such as `Issued` on `invoice` and on `creditNote`, write
   `invoice.Issued`.
@@ -145,7 +150,7 @@ write them. The fields say which:
   or `ignores`. It is state of the one entity or row that the handler writes.
 - `writes`: events on this component's streams, or `changes` of an outside
   thing. A change of an outside thing is an action.
-- `sends`: commands to another component's command stream.
+- `sends`: commands to another stream's command stream.
 - `one_of`: the outcomes, when they depend on state. Each branch has `when`,
   a condition of a few words that becomes the label on the arrow. A branch
   that writes a rejection writes it because something reacts to it. Put
@@ -160,6 +165,8 @@ write them. The fields say which:
   processed"); `idempotence` covers them.
 - `idempotence`: only when it is not the sequence check: `reservation`,
   `upsert-version`, `state-guard`, or a sentence.
+- `component`: as for a stream, left out of a new handler until the walks are
+  done.
 - One entry for each pair of component and message. Two components can handle
   the same event.
 
