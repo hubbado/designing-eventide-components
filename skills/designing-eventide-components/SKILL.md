@@ -19,6 +19,7 @@ reviewer is the person who knows the business and owns the design. The
 reviewer decides:
 
 - the words of each requirement;
+- the components, and the streams that each one holds;
 - each problem that is accepted, and its escape hatch;
 - each question in the model's `questions` and the design document's Open;
 - a name, when no plain name fits a message.
@@ -209,6 +210,8 @@ Read the model and the scenarios against this list, item by item:
   data from another component arrived.
 - The handlers that write one version-gated row handle messages of one
   category.
+- No component that others depend on has messages, attributes or state that
+  only one of its users needs, and each component boundary is in `questions`.
 - Every handler is safe when its message arrives twice.
 - The cases of stage 3 (twice, at the same time, in a different order, late)
   have a scenario, or a note says why they cannot happen.
