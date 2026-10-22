@@ -65,7 +65,9 @@ model, and when you walk the scenarios.
   as a lost network or database connection, raises, and the consumer retries
   the message. A handler that raises on a domain failure stops its consumer,
   and the consumer must keep running to handle the retry that the person
-  sends next.
+  sends next. In its first test, a handler that exchanged an authorization
+  code with an external system raised when the system refused a stale code,
+  and its consumer stopped.
 - **Handlers.** A handler reads messages, takes actions, writes messages,
   and refuses to write them. For each one, write what it reads (the message
   that it handles, and its entity), what actions it takes outside the store,
@@ -149,6 +151,13 @@ already taken. So in a scenario walk, ask "what does the entity look like when
 the handler fetches it?", not "what has the consumer seen at this position?".
 Across components, ask what has arrived in your own entity or read model. That
 can lag.
+
+**Why:** a handler wrote a "complete" event when the last of three expected
+documents arrived. Its consumer was stopped while all three arrivals were
+written. When it started again, it handled each arrival against the entity
+projected to the head of the stream, found all three documents each time, and
+wrote "complete" three times. The design had assumed that only the handler of
+the third arrival would see three.
 
 ### An entity takes a recorded value from its event
 
@@ -260,6 +269,12 @@ Optimistic concurrency is not idempotence, but it goes with it. The handler
 fetches with `include: :version` and writes with `expected_version`. On a
 conflict the consumer retries the message: it fetches again and decides
 again. Fetch, decide, write and retry are one unit.
+
+**Why:** a notification handler recorded nothing about the documents that it
+had notified. Only its consumer's position kept it away from them. When the
+handler moved to a consumer with a new position, that consumer read the
+category from the start and sent the notifications for every old document
+again.
 
 **In the model:** a handler that does not use the sequence check says which
 mechanism it uses, in `idempotence`.
@@ -388,6 +403,13 @@ a comment on the command. `processed_time` is the time at which the handler
 wrote the event, from the
 clock, and an event carries it only when the business needs to know it.
 Message DB records when it wrote each message in any case.
+
+**Why:** a void event carried a bare `date`, copied from the event that made
+the charge. Later, nobody could tell if it was the date of the charge or the
+date from which the void applied. In the same way, three components set `time`
+to the moment at which the handler wrote the event, while other events used
+`time` for the time of their fact, so a reader could not tell which time an
+event held.
 
 **In the model:** read each attribute with its message's name in front of it.
 If the attribute repeats the message's name, remove the repeat.
