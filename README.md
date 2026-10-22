@@ -84,8 +84,71 @@ the skill: "Use the designing-eventide-components skill to …".
 An organisation can add rules of its own, or change the skill's rules, in a
 document of its own. The skill does not look for such a document. The
 organisation's agent instructions, such as `AGENTS.md` or `CLAUDE.md`, name it
-and say that its rules decide over the skill's. Each rule in it says whether
-it narrows a rule of the skill, replaces one, or is new.
+and say that its rules decide over the skill's.
+
+### The document
+
+Each rule is in the form of the skill's own rules, and its heading says
+whether it narrows a rule of the skill, replaces one, or is new. Name the
+skill's rule exactly, so that the agent can find it. For example,
+`docs/eventide-design-rules.md`:
+
+```markdown
+# Acme rules for designing Eventide components
+
+These rules decide over the designing-eventide-components skill.
+
+## The actor is actor_id: narrows "The parts of a design"
+
+The attribute that names who acted is `actor_id`, on every command and on the
+events that follow it.
+
+**Why:** Acme's audit reports read `actor_id` in every component.
+
+## A value is set with one Set command: replaces "A value that is set and then changed has an Add and a Change"
+
+A value that is set and then changed has one command, `Set<Value>`, and one
+event, `<Value>Set`. The handler ignores a `Set` that gives the value that the
+entity already holds.
+
+**Why:** Acme's screens do not tell a first value apart from a change, and no
+consumer reacts to the difference.
+
+## Every event names the system that sent its command: new
+
+Every event carries `source_system`, the system that sent the command that
+caused it.
+
+**Why:** two of Acme's systems send the same commands, and support must tell
+them apart.
+
+**In the model:** list `source_system` on every event.
+```
+
+### The instruction that names it
+
+Put this in the agent instructions that the design sessions read:
+
+```markdown
+## Designing event flows
+
+To design the streams, commands, events and handlers of a component, use the
+`designing-eventide-components` skill. Acme's rules for it are in
+`docs/eventide-design-rules.md`, in the folder that holds this file. Read them
+before you start. They decide over the skill's.
+```
+
+### Where the instruction goes
+
+- **One repository:** in its own `CLAUDE.md` or `AGENTS.md`.
+- **Many repositories:** the instruction must reach every design session.
+  Claude Code reads each `CLAUDE.md` from the session's folder up to the root,
+  and the user's own `~/.claude/CLAUDE.md`. So a `CLAUDE.md` in a folder that
+  holds all of the organisation's repositories, or in each person's user
+  file, carries it once. Other agents read their instruction files in their
+  own ways, so check yours.
+
+Keep one copy of the document. A copy in each repository drifts.
 
 ## Contributing
 
