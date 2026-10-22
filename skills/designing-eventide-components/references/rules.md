@@ -21,6 +21,7 @@ model, and when you walk the scenarios.
   - Say what is true now, in the words that people use
   - Name attributes within their message
   - A message carries its context
+  - Give at once what is known at once
   - A command acts on the entity's current state
   - A screen action can send several commands
   - A value that is set and then changed has an Add and a Change
@@ -441,6 +442,33 @@ schema: if the schema is wrong, change it everywhere, stored events
 included, so that no consumer has to handle old versions of an event. Stored
 events are backfilled with the context, and a handler does not accept an
 event without it: a handler that tolerates missing context hides bad data.
+
+### Give at once what is known at once
+
+When the information for an act is known at one time, one message carries all
+of it. Do not split it into a message that starts a thing and more messages
+that add its parts, such as a command that opens a document and a command for
+each of its lines. A large and complex schema is not a fault when it holds
+what the handler needs to act. The lines of one document are one fact ("A
+screen action can send several commands").
+
+Use separate messages only for parts that become known at different times,
+such as a due date that is corrected after issue ("A value that is set and
+then changed has an Add and a Change").
+
+**Why:** a thing given in pieces cannot be checked or calculated as a whole
+until its last piece arrives, so the work that needs the whole moves to a
+later message or into the projection. In one design, a document was opened by
+one command, and each line was added by a command of its own. The opening
+event could not hold the totals, because no line existed yet, so the entity
+added up the totals as each line was applied. When the lines later moved into
+the opening command, the totals stayed in the projection, where the old shape
+had put them, and no event recorded them until the document was issued.
+
+**In the model:** a command that starts a thing carries all that the sender
+knows at that time. For a command that adds a part of a thing, name the
+requirement in which the part becomes known later than the thing. If there is
+none, put the part on the command that starts the thing.
 
 ### A command acts on the entity's current state
 
