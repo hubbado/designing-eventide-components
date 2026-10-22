@@ -1,0 +1,132 @@
+# Event-flow model of adding an assignment to a purchase order and removing it.
+# The example data in assets/event-flow-template.html presents it.
+design: Purchase order assignments
+requirements: requirements.md
+scenarios: scenarios.md
+sources:
+  - Two production components, simplified for this example
+
+streams:
+  assignment:
+    component: assignment_component
+    entity: Assignment
+    key: "{id}"
+    why: Knows its currency, its client, and the purchase order that it is on or is being added to.
+    commands:
+      AddCurrency: [assignment_id, currency, user_id?]
+      AddClient: [assignment_id, client_id, user_id?]
+      AddToPurchaseOrder: [assignment_id, purchase_order_id, addition_id, user_id?]
+      RemoveFromPurchaseOrder: [assignment_id, user_id?]
+    events:
+      CurrencyAdded: [assignment_id, currency, user_id?]
+      ClientAdded: [assignment_id, client_id, user_id?]
+      AddToPurchaseOrderInitiated: [assignment_id, purchase_order_id, addition_id, user_id?]
+      PurchaseOrderAddAssignmentSent: [assignment_id, purchase_order_id, addition_id, user_id?]
+      AddedToPurchaseOrder: [assignment_id, purchase_order_id, addition_id, user_id?]
+      AddToPurchaseOrderRejected:
+        attributes: [assignment_id, purchase_order_id, addition_id, reason, data, user_id?]
+        reasons: [no_currency, no_client_id, currency_mismatch, client_mismatch]
+      RemovedFromPurchaseOrder: [assignment_id, purchase_order_id, user_id?]
+
+  purchaseOrder:
+    component: purchase_order_component
+    entity: Purchase Order
+    key: "{id}"
+    why: Holds its currency, its client and its assignments, so the check and the addition are one write.
+    commands:
+      Create: [purchase_order_id, managing_company_id, client_id, currency, value, user_id?]
+      AddAssignment: [purchase_order_id, assignment_id, addition_id, client_id, currency, user_id?]
+      RemoveAssignment: [purchase_order_id, assignment_id, user_id?]
+    events:
+      Created: [purchase_order_id, managing_company_id, client_id, currency, value, user_id?]
+      AssignmentAdded: [purchase_order_id, assignment_id, addition_id, client_id, currency, user_id?]
+      AssignmentRejected:
+        attributes: [purchase_order_id, assignment_id, addition_id, reason, data, user_id?]
+        reasons: [currency_mismatch, client_mismatch]
+      AssignmentRemoved: [purchase_order_id, assignment_id, user_id?]
+
+handlers:
+  # A full design would have Create write CreateInitiated, and Created follow
+  # when a reference number is reserved. The example leaves the reservation out.
+  - component: purchase_order_component
+    handles: Create
+    writes: [Created]
+
+  # A full design would also let the currency change, with an Add and a
+  # Change. The example leaves changes out. AddClient is the same.
+  - component: assignment_component
+    handles: AddCurrency
+    writes: [CurrencyAdded]
+
+  - component: assignment_component
+    handles: AddClient
+    writes: [ClientAdded]
+
+  # A full design would move an assignment that is on another purchase order,
+  # or is being added to one. The example leaves moving out.
+  - component: assignment_component
+    handles: AddToPurchaseOrder
+    reads: [currency, client_id, purchase_order_id, pending_purchase_order_id]
+    idempotence: reservation
+    one_of:
+      - writes: [AddToPurchaseOrderInitiated]
+      - when: no currency
+        writes: [AddToPurchaseOrderRejected]
+        reason: no_currency
+      - when: no client
+        writes: [AddToPurchaseOrderRejected]
+        reason: no_client_id
+    ignores:
+      - the assignment is on that purchase order
+      - the assignment is being added to that purchase order
+
+  - component: assignment_component
+    handles: AddToPurchaseOrderInitiated
+    reads: [pending_addition_id]
+    sends: [AddAssignment]
+    writes: [PurchaseOrderAddAssignmentSent]
+    ignores: [its addition_id is not the pending addition id]
+
+  # The ignore is for AddAssignment sent again, when the write of
+  # PurchaseOrderAddAssignmentSent fails after the send. No scenario walks it.
+  - component: purchase_order_component
+    handles: AddAssignment
+    reads: [currency, client_id, assignments]
+    one_of:
+      - writes: [AssignmentAdded]
+      - when: currency differs
+        writes: [AssignmentRejected]
+        reason: currency_mismatch
+      - when: client differs
+        writes: [AssignmentRejected]
+        reason: client_mismatch
+    ignores: [the assignment is on the purchase order]
+
+  - component: assignment_component
+    handles: AssignmentAdded
+    reads: [pending_addition_id]
+    writes: [AddedToPurchaseOrder]
+    ignores: [its addition_id is not the pending addition id]
+
+  # The ignore is AssignmentAdded's (scenario 5), for a refusal that arrives
+  # after a removal. No scenario walks it.
+  - component: assignment_component
+    handles: AssignmentRejected
+    reads: [pending_addition_id]
+    writes: [AddToPurchaseOrderRejected]
+    ignores: [its addition_id is not the pending addition id]
+
+  - component: assignment_component
+    handles: RemoveFromPurchaseOrder
+    reads: [purchase_order_id, pending_purchase_order_id]
+    sends: [RemoveAssignment]
+    writes: [RemovedFromPurchaseOrder]
+    ignores: [the assignment is not on a purchase order, nor being added to one]
+
+  - component: purchase_order_component
+    handles: RemoveAssignment
+    reads: [assignments]
+    writes: [AssignmentRemoved]
+    ignores: [the assignment is not on the purchase order]
+
+questions: []
