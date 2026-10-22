@@ -60,8 +60,7 @@ Time runs from left to right.
    it explains. Looking alone is not enough either: the check has found
    overlaps that several rounds of looking had missed.
 5. Commit the model and the page beside the design document, and add their
-   links to the design document. If the project's overlay says where to
-   publish pages for review, publish it there.
+   links to the design document.
 6. Present it: the page, the panels in reading order with one line for each,
    and the decisions that you need. The model's `questions` show under the
    canvas. Then stop, and wait for the review before you draw more panels.

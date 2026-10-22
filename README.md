@@ -28,6 +28,8 @@ ln -s "$PWD/skills/designing-eventide-components" ~/.claude/skills/designing-eve
 
 ## A project's own conventions
 
-A project adds its own conventions in an overlay: a Markdown file that the
-project's agent instructions, such as `AGENTS.md` or `CLAUDE.md`, name. Where
-the overlay differs from the skill, the overlay wins for that project.
+An organisation can add rules of its own, or change the skill's rules, in a
+document of its own. The skill does not look for such a document. The
+organisation's agent instructions, such as `AGENTS.md` or `CLAUDE.md`, name it
+and say that its rules decide over the skill's. Each rule in it says whether
+it narrows a rule of the skill, replaces one, or is new.

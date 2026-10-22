@@ -30,17 +30,8 @@ Stop and wait for the reviewer:
 - after the first one or two panels. The reviewer's questions on the first
   panels often change the foundations that the other panels stand on.
 
-## The project's overlay
-
-If the project's agent instructions name an overlay for this skill, read it
-before anything else. An overlay holds a project's own conventions: where its
-designs live, the libraries that implement the mechanisms, and its house
-rules. Where it differs from this skill, the overlay wins for that project,
-and it names the rule that it changes.
-
 ## Read these first
 
-- The overlay, if the project has one.
 - The feature's design document, if there is one.
 - The example in `examples/purchase-orders/`: the requirements, the model and
   the scenarios of adding an assignment to a purchase order and removing it.
@@ -49,8 +40,7 @@ and it names the rule that it changes.
 
 A design is a living document. Change its files in place, and let git keep
 their history; do not start a new file for a new stage or a new day. Keep a
-design's files together in one folder, `docs/design/<topic>/` unless the
-overlay says otherwise:
+design's files together in one folder, such as `docs/design/<topic>/`:
 
 - `design.md`: the requirements document, the source of what the design must
   do.

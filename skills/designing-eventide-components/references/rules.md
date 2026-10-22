@@ -2,11 +2,11 @@
 
 Each rule records a cost already paid or a decision already taken, with its
 reason. Apply them when you sketch candidate models, when you write the
-model, and when you walk the scenarios. Where the project's overlay changes a
-rule, the overlay wins for that project.
+model, and when you walk the scenarios.
 
-When a review or an incident teaches a new rule, write it in the project's
-overlay, in the form used here: the rule, **Why**, and **In the model**, with
+When a review or an incident teaches a new rule, write it down where the
+project keeps its rules, in the form used here: the rule, **Why**, and
+**In the model**, with
 a **Source** that names the change log entry or the incident that taught it,
 instead of retelling its details. Write it for a reader who designs another
 component and has never seen the design that taught it. Use general nouns,
@@ -211,8 +211,7 @@ own.
 
 Messages are delivered at least once. A handler cannot tell from its stream
 position that it did the work before ("Reason about the entity"), so its
-idempotence must be explicit. These are the mechanisms. The project's overlay
-names the libraries that implement them.
+idempotence must be explicit. These are the mechanisms.
 
 - **A sequence check**, the usual default. The entity records, for each
   source, the global position of the last message that it applied. The
@@ -542,8 +541,7 @@ A check that needs nothing but the command's own attributes is the command's
 validation, at the sender, not a refusal by its handler: a required attribute
 is present and not blank, an id is a UUID, a revision is an integer, a time
 is in ISO 8601. An invalid command never reaches the command stream. For
-example, a `Void` is refused there when its `reason` is blank. The project's
-overlay says how its senders validate commands.
+example, a `Void` is refused there when its `reason` is blank.
 
 So a missing or blank attribute is never a rejection reason or an ignore. A
 handler's rejections and ignores are decisions from the entity's state. A
@@ -629,8 +627,8 @@ through it, and nothing recorded is ever taken back.
 handler wrote, say so in the model's `questions`, and record the concern in
 the design document's Open.
 
-**Ways that complexity has been reduced.** When a design finds a new way, add
-it to the project's overlay in the same form, and propose it to this skill.
+**Ways that complexity has been reduced.** When a design finds a new way,
+write it down in the same form, and propose it to this skill.
 
 - **Let the entity that acts be bounded by what is recorded.** Record facts
   generously, and let a later decision, made by the entity that acts, choose
@@ -694,8 +692,8 @@ A term is a word that the design gives a special meaning: an entry in the
 design document's Terms, a requirement id, or the name of a message, an
 attribute or a rejection reason. When a decision changes a term, change it in
 the same commit in every document that says what is true now: the design's
-own files, the model and its panels included, and the project's guides and
-overlay. Do not leave it for a later rewrite. Leave history as it is: the
+own files, the model and its panels included, and the project's guides. Do
+not leave it for a later rewrite. Leave history as it is: the
 change log, any work log, and each document with a date in its name, such as
 a plan for one piece of work. Each records what was true on its date. A
 quotation, or an account of what happened, keeps the words of its time.
