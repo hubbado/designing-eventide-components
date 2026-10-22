@@ -165,16 +165,18 @@ add an entry to the change log.
 Some scenarios later become interactive tests: they run against the live
 components, and a person inspects their output.
 
-**Think of it on paper.** Before you reach for a protocol, ask how the process
-worked when people did it on paper, between desks and departments. The same
-races happened then: a clerk paid an invoice while another department decided
-to void it. Paper had no locks, no compensating transactions, and no way to
-read another department's files. So its answers were cheap: act on the
-document in your hand, correct forward with a new document, such as an
-adjustment or a credit note, that the next run picks up, and let a
-reconciliation find the differences. The design can often use the same
+**Think of it on paper.** Before you reach for a protocol, picture the process
+done by people on paper, between desks and departments. Many processes were
+never done on paper, and a design does not have to copy how paper did it. The
+picture is a way to think: paper has no locks, no compensating transactions,
+and no way to read another department's files, so it shows how to deal with a
+race, or with the coordination of two parties, without machinery. A clerk
+pays an invoice while another department decides to void it. The clerk acts
+on the document in hand, the correction comes forward as a new document, such
+as an adjustment or a credit note, that the next run picks up, and a
+reconciliation finds the differences. A design can often use the same
 answer: a void that arrives after a payment becomes a deduction from the next
-payment, as a clerk once deducted it from the next pay.
+payment.
 
 The picture also shows the cost of each alternative. A two-phase hold is a
 phone call to the other department before every payment, and a wait for the
