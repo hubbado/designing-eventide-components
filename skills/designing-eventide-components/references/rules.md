@@ -14,6 +14,7 @@ model, and when you walk the scenarios.
   - A component holds its state in streams, not in an SQL database
   - A version-gated row takes updates from one category only
   - Every handler is idempotent, and the model says how
+  - An entity's collections stay small for the life of its stream
 - Messages
   - Name messages in plain business words
   - Say what is true now, in the words that people use
@@ -241,6 +242,40 @@ again. Fetch, decide, write and retry are one unit.
 
 **In the model:** a handler that does not use the sequence check says which
 mechanism it uses, in `idempotence`.
+
+### An entity's collections stay small for the life of its stream
+
+A consumer keeps each entity that it fetches in memory, whole, for as long as
+it runs: Eventide's entity cache keeps the entities in a hash, and nothing
+takes one out. So a consumer's memory is the number of entities that it has
+handled times their size. A collection on an entity, such as a list of start
+dates or a set of the documents that it has recorded, grows each time a
+message adds an entry. When the stream lives for years and the entries come
+with volume, the entity grows for years.
+
+Before an entity keeps a collection, know three things: what one entry holds,
+what adds an entry and how often, and how long the stream lives.
+
+- Entries that come with a rare business act are safe. An agreement that
+  keeps each of its starts, with the end date of each, gains one entry each
+  time it starts again, a few times in its life. Such a collection can be the
+  smallest correct state: when the latest start can be cancelled and the one
+  before it then applies again, the entity cannot keep only the latest two.
+- Entries that come with volume are not safe: one for each invoice, payment
+  or source stream, on a stream that lives as long as the company. Keep only
+  the entries that a decision still reads, and drop each one when no decision
+  can read it again; or keep a total in place of the entries; or split the
+  stream by period, so that each stream ends.
+- A sequence kept for each source stream, for idempotence ("Every handler is
+  idempotent"), is such a collection.
+
+**Why:** an entity that grows shows no fault in the tests or at go-live. Its
+cost shows years later, as a consumer whose memory grows until it is stopped.
+Snapshots make a fetch shorter, but the entity in memory is the same size.
+
+**In the model:** a handler's `reads` names what the entity keeps. For each
+collection in it, the stream's comment says what adds an entry, how often,
+and what keeps the collection small.
 
 ## Messages
 
