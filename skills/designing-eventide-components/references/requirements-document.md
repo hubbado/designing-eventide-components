@@ -36,6 +36,10 @@ In this order:
   "**settled-once.** An item MUST be settled at most once."
 - **Out of scope.** What the process does not do, in one line each, and who
   or what does it instead.
+- **Other users.** For each thing whose state the design changes, the other
+  processes that change it now, and those that are likely to need it to act
+  later, in one line each, as the reviewer knows them. The design does not
+  build for them. They tell which components are afferent.
 - **Prerequisites.** What must be in place before it goes live, in order, when
   there is any.
 - **Open.** The questions that a requirement waits on, with the requirement's

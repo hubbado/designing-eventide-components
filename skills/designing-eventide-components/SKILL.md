@@ -19,6 +19,7 @@ reviewer is the person who knows the business and owns the design. The
 reviewer decides:
 
 - the words of each requirement;
+- the components, and the streams that each one holds;
 - each problem that is accepted, and its escape hatch;
 - each question in the model's `questions` and the design document's Open;
 - a name, when no plain name fits a message.
@@ -79,6 +80,14 @@ state a rule more strictly than the business needs, because on paper the
 correction cost nothing and nobody saw it. The walks in stage 3 show which
 rules are too strict.
 
+Look a little into the future. For each thing whose state the process
+changes, ask the reviewer which other processes change it now, and which are
+likely to need it to act later. Record the answers in the design document's
+"Other users". Until the reviewer answers, write what you expect, and put the
+question in Open. Do not design for them: they tell which components are
+afferent (the rule "Afferent components take commands, and efferent
+components orchestrate them").
+
 ### 2. Candidate models, then the model
 
 Read `references/rules.md` and `references/model-format.md`.
@@ -107,6 +116,11 @@ Read `references/rules.md` and `references/model-format.md`.
 - Write the whole component design in one model: every stream, message and
   handler that the requirements need. Each scenario then tests the whole
   design; do not build it from fragments that one scenario needs.
+- Decide the components when you write the model, and not before: the
+  requirements and "Other users" must say what the process is first. Group
+  the streams by the rule "Afferent components take commands, and efferent
+  components orchestrate them", and put each component, afferent or
+  efferent, to the reviewer in `questions`.
 
 ### 3. Try to break the requirements
 
@@ -209,6 +223,9 @@ Read the model and the scenarios against this list, item by item:
   data from another component arrived.
 - The handlers that write one version-gated row handle messages of one
   category.
+- After the walks, no afferent component handles the events of a component
+  that depends on it, or has a message, attribute or state that only one of
+  its users needs. Each component, afferent or efferent, is in `questions`.
 - Every handler is safe when its message arrives twice.
 - The cases of stage 3 (twice, at the same time, in a different order, late)
   have a scenario, or a note says why they cannot happen.

@@ -80,6 +80,11 @@ streams:
     attributes: [invoice_id, supplier_id, { line_items: [worker_id, net_amount] }, user_id]
     proposed: [supplier_id, line_items]
   ```
+- `component` names the component that holds the stream. For a new stream,
+  decide it when you write the model, after the requirements and "Other
+  users" ("Afferent components take commands, and efferent components
+  orchestrate them" in [rules.md](rules.md)). An `existing` stream has its
+  component already.
 - The order of `streams` is the order of the lanes in every panel. Put the
   component that starts the flow first, and keep each component's streams
   together.
@@ -145,7 +150,7 @@ write them. The fields say which:
   or `ignores`. It is state of the one entity or row that the handler writes.
 - `writes`: events on this component's streams, or `changes` of an outside
   thing. A change of an outside thing is an action.
-- `sends`: commands to another component's command stream.
+- `sends`: commands to another stream's command stream.
 - `one_of`: the outcomes, when they depend on state. Each branch has `when`,
   a condition of a few words that becomes the label on the arrow. A branch
   that writes a rejection writes it because something reacts to it. Put
