@@ -150,10 +150,10 @@ so that a deposit from another sender could not end a transfer. Every other
 process that moves money in or out of an account would add the same to the
 account.
 
-**In the model:** leave out the `component` of a new stream until the walks
-are done. Then group the streams into components by this rule, and put each
-component, afferent or efferent, to the reviewer in `questions`, with the
-couplings that support it.
+**In the model:** decide each new stream's `component` when you write the
+model, after the requirements and "Other users". Put each component, afferent
+or efferent, to the reviewer in `questions`, with the couplings that support
+it. After the walks, read the couplings again.
 
 ### A handler decides from the one thing that it writes
 

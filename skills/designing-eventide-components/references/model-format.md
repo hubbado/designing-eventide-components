@@ -81,13 +81,13 @@ streams:
     proposed: [supplier_id, line_items]
   ```
 - `component` names the component that holds the stream. For a new stream,
-  leave it out until the walks are done, and then decide it ("Afferent
-  components take commands, and efferent components orchestrate them" in
-  [rules.md](rules.md)). An `existing` stream has its component from the
-  start.
+  decide it when you write the model, after the requirements and "Other
+  users" ("Afferent components take commands, and efferent components
+  orchestrate them" in [rules.md](rules.md)). An `existing` stream has its
+  component already.
 - The order of `streams` is the order of the lanes in every panel. Put the
-  stream that starts the flow first. When the components are decided, keep
-  each component's streams together.
+  component that starts the flow first, and keep each component's streams
+  together.
 - Refer to a message by its name. Where two streams have a message with the
   same name, such as `Issued` on `invoice` and on `creditNote`, write
   `invoice.Issued`.
@@ -165,8 +165,6 @@ write them. The fields say which:
   processed"); `idempotence` covers them.
 - `idempotence`: only when it is not the sequence check: `reservation`,
   `upsert-version`, `state-guard`, or a sentence.
-- `component`: as for a stream, left out of a new handler until the walks are
-  done.
 - One entry for each pair of component and message. Two components can handle
   the same event.
 

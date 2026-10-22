@@ -116,6 +116,11 @@ Read `references/rules.md` and `references/model-format.md`.
 - Write the whole component design in one model: every stream, message and
   handler that the requirements need. Each scenario then tests the whole
   design; do not build it from fragments that one scenario needs.
+- Decide the components when you write the model, and not before: the
+  requirements and "Other users" must say what the process is first. Group
+  the streams by the rule "Afferent components take commands, and efferent
+  components orchestrate them", and put each component, afferent or
+  efferent, to the reviewer in `questions`.
 
 ### 3. Try to break the requirements
 
@@ -184,12 +189,6 @@ adjustment or a credit note, that the next run picks up, and a reconciliation
 finds the differences. A design can often use the same answer: a void that
 arrives after a payment becomes a deduction from the next payment.
 
-**Then decide the components.** When the walks are done, group the new
-streams into components by the rule "Afferent components take commands, and
-efferent components orchestrate them", from the model and the design
-document's "Other users". Write each new stream's and handler's `component`,
-and put each component, afferent or efferent, to the reviewer in `questions`.
-
 ### 4. Present, only when the reviewer asks
 
 Read `references/presenting.md`. Draw the first one or two panels, and stop
@@ -224,10 +223,9 @@ Read the model and the scenarios against this list, item by item:
   data from another component arrived.
 - The handlers that write one version-gated row handle messages of one
   category.
-- Each new stream's `component` was decided after the walks. No afferent
-  component handles the events of a component that depends on it, or has a
-  message, attribute or state that only one of its users needs. Each
-  component, afferent or efferent, is in `questions`.
+- After the walks, no afferent component handles the events of a component
+  that depends on it, or has a message, attribute or state that only one of
+  its users needs. Each component, afferent or efferent, is in `questions`.
 - Every handler is safe when its message arrives twice.
 - The cases of stage 3 (twice, at the same time, in a different order, late)
   have a scenario, or a note says why they cannot happen.
