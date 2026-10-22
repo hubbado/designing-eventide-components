@@ -1,6 +1,7 @@
 ---
 name: designing-eventide-components
 description: Designs the commands, events, streams and handlers of Eventide components, or a change to them, before any code is written. Works from requirements to candidate models, a YAML model, and scenarios that try to break the requirements, with a human reviewer who decides. Use when asked to design an Eventide component, an event flow, or the messages of a process.
+license: MIT. Complete terms in LICENSE.txt
 ---
 
 # Designing Eventide components
