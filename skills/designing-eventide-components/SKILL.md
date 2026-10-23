@@ -43,6 +43,14 @@ Stop and wait for the reviewer:
 - after the first one or two panels. The reviewer's questions on the first
   panels often change the foundations that the other panels stand on.
 
+At each stop, write for a reviewer who has seen only what you have shown
+them. Give each new or changed thing in full the first time that you show it:
+a requirement in its words, a candidate in its sketch, a problem in what goes
+wrong. An id alone is enough only for a thing that the reviewer has already
+seen in full. A reviewer cannot judge a name: one report gave five new
+requirements by their ids alone, and the reviewer could not tell whether any
+of them was wrong.
+
 ## Read these first
 
 - The feature's design document, if there is one.
@@ -97,7 +105,7 @@ changes, ask the reviewer which other processes change it now, and which are
 likely to need it to act later. Record the answers in the design document's
 "Other users". Do not design for them: they tell which components are
 afferent (the rule "Afferent components take commands, and efferent
-components orchestrate them").
+components coordinate them").
 
 Then stop, and present the draft to the reviewer. Name each requirement that
 is your assumption and not the request's. Ask only the questions whose
@@ -120,24 +128,54 @@ Read `references/rules.md` and `references/model-format.md`.
 
 - Consider more than one way to model the process with streams. They can be
   very different. A sketch is enough for a candidate: its streams, their
-  keys, what each holds, and the component of each stream.
+  keys, what each holds, and the component of each stream; for each stream,
+  the commands that it takes and the events that it writes; and for each
+  component, the commands that it sends and the events of other streams that
+  it handles. Leave out the attributes. The messages and the handlers show the
+  couplings that the row "Other users" judges.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
-  orchestrate them".
+  coordinate them".
 - Compare the candidates in a table. The requirements that decide where state
   lives are the rows, the candidates are the columns, and each cell says how
-  that candidate keeps that requirement: "one write", "a relay", "a protocol",
-  "application only". Walk a scenario through a candidate only when the table
-  does not decide.
-- Then stop, and present the candidates to the reviewer in the conversation:
-  the table, the candidate that you recommend, and why. Tell the reviewer
-  about each candidate that you would reject: its sketch in a few lines, what
-  it does better than the one that you recommend, and the row that rejects
-  it. A rejection that the reviewer can find only in the change log is a
-  decision that you made alone. The reviewer selects a candidate, or asks for
-  another.
-- Write the model only for the candidate that the reviewer selects. Record
+  that candidate keeps that requirement, in one of these words:
+  - "inside one stream": one stream holds every fact that the rule needs. Its
+    handler checks the rule, and accepts or rejects the command, in one write
+    with `expected_version`, so nothing comes between the check and the
+    result.
+  - "across streams: a workflow of N steps": the facts are in more than one
+    stream, so a coordinating component sends commands and handles their
+    events, one step after another. Say which steps can be rejected. Between
+    two steps, one is done and the next is not.
+  - "a read model": the rule is checked against a read model, which can be
+    out of date, so two decisions at the same time can both pass.
+  - "the app only": no component checks the rule. The app checks it before it
+    sends the command.
+
+  Walk a scenario through a candidate only when the table does not decide.
+- Then stop, and present to the reviewer in the conversation, in this order,
+  so that nothing is compared before the reviewer has seen it:
+  1. Each requirement that changed since the reviewer last saw the
+     requirements, in its words, with each new assumption marked.
+  2. Each candidate, the one that you recommend first: a name that says its
+     idea, its sketch, and its main path walked through it with the names in
+     its sketch and concrete data, such as real ids and amounts.
+  3. The table, with a short label for each candidate as its column, the
+     words of each requirement beside its id, and what each cell word means.
+  4. The candidate that you recommend: the rows where it does better than
+     the others, and the cost that you accept. A row where every candidate
+     is the same decides nothing.
+  5. Each candidate that you would reject: what it does better than the one
+     that you recommend, and the row that rejects it. A rejection that the
+     reviewer can find only in the change log is a decision that you made
+     alone.
+
+  The reviewer selects a candidate, or asks for another.
+- Write the model only for the candidate that the reviewer selects, and only
+  when the reviewer has agreed or corrected each assumption that can change
+  it. A selection does not answer an assumption: when the reviewer selects
+  and leaves one unanswered, ask again before you write the model. Record
   the choice in the design document's "Model selected". Record the
   candidates, the table, and each candidate dismissed, with why and when, in
   the change log. The selected model can look obvious afterwards; the record
@@ -189,12 +227,14 @@ in this order:
   at his company who found a race condition in production. The prizes on the
   shelf went out of date, because nobody ever claimed one.
 - Then choose: remove it by changing the design so that it cannot happen;
-  guard it; detect it and correct it forward; or accept it, and name the
-  escape hatch. If the choice changes what a requirement promises, change its
-  words with the business, and have the reviewer agree them.
+  guard it; detect it and correct it forward; stop the line, when the cause
+  is wrong incoming data (the rule "Stop the line on incoming data that is
+  wrong"); or accept it, and name the escape hatch. If the choice changes
+  what a requirement promises, change its words with the business, and have
+  the reviewer agree them.
 
 When a walk shows that a requirement needs two streams to agree, look at the
-stream keys again before you add a protocol. A rule inside one stream is
+stream keys again before you add a workflow. A rule inside one stream is
 cheap, because the stream orders its writes. A rule across streams or
 components needs requests, replies and rejections. When no handler can keep a
 requirement at the moment of its decision, because the fact arrives after
@@ -206,7 +246,7 @@ it was dropped when you present the model.
 Some scenarios later become interactive tests: they run against the live
 components, and a person inspects their output.
 
-**Think of it as a manual process.** Before you reach for a protocol, picture
+**Think of it as a manual process.** Before you reach for a workflow, picture
 the process done by hand, by people in a physical world, between desks and
 departments. Many processes were never done by hand, and a design does not
 have to copy a manual one. The picture is a way to think about races and

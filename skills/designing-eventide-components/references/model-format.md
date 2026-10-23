@@ -82,7 +82,7 @@ streams:
   ```
 - `component` names the component that holds the stream. For a new stream,
   it is the component of the candidate that the reviewer selected ("Afferent
-  components take commands, and efferent components orchestrate them" in
+  components take commands, and efferent components coordinate them" in
   [rules.md](rules.md)). An `existing` stream has its component already.
 - The order of `streams` is the order of the lanes in every panel. Put the
   component that starts the flow first, and keep each component's streams

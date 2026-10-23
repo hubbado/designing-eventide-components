@@ -9,7 +9,7 @@ model, and when you walk the scenarios.
 - The parts of a design
 - Streams, stores and state
   - A component never reads another component's store
-  - Afferent components take commands, and efferent components orchestrate them
+  - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - Reason about the entity, not about stream positions
   - An entity takes a recorded value from its event
@@ -94,7 +94,7 @@ is projected through one store class, with one entity class.
 
 **Why:** components are independent services with their own streams and
 stores, and they communicate only through messages. A read of another
-component's store couples the two, and it skips the protocol that protects the
+component's store couples the two, and it skips the workflow that protects the
 other component's invariants.
 
 **Why, also:** Eventide's entity cache and snapshots are not keyed by the
@@ -115,7 +115,7 @@ decision needs data that another component owns, a scenario must show where
 that data arrived: an earlier step in which a handler of this component
 received the other component's event, or a command that carries the data.
 
-### Afferent components take commands, and efferent components orchestrate them
+### Afferent components take commands, and efferent components coordinate them
 
 A component's afferent couplings are the components that depend on it. Its
 efferent couplings are the components that it depends on. A component depends
@@ -132,10 +132,10 @@ it. It holds no message, attribute or state that only one of its users needs,
 such as an attribute that every other sender leaves empty.
 
 A component is efferent when it depends on many components, and few or none
-depend on it. It costs little to change. It tends to be an orchestrator: it
-sends commands to afferent components and handles their events. Put a
-process, and the state and guards that it needs, in an efferent component,
-where change is cheap.
+depend on it. It costs little to change. It tends to be a coordinating
+component: it sends commands to afferent components and handles their events.
+Put a process, and the state and guards that it needs, in an efferent
+component, where change is cheap.
 
 Which components are afferent is a fact of the business: how many processes
 change a thing, now and later. One design's requirements often name only one
@@ -496,9 +496,9 @@ A consumer that cannot act on it alone must keep a copy of the earlier event's
 state, or read another component's store. One model kept a stream for each
 document only so that a `Voided` that carried just the document id could
 reach the stream that needed it. With the context on the upstream events,
-that stream and its relay handlers went. A reply on the Eventide Slack put
-it this way: "Messages aren't subject to normalization. They're subject to
-contextualization."
+that stream and the handlers that passed the void on went. A reply on the
+Eventide Slack put it this way: "Messages aren't subject to normalization.
+They're subject to contextualization."
 
 **In the model:** when the design needs context that an existing upstream
 event does not carry, change the upstream event. Do not add a stream to work
@@ -922,7 +922,7 @@ From the purchase order example and the designs before it:
 - **Pass a rejection through.** The requester's rejection copies the reasons
   of the reply. The screen must show a sensible message for a reason that it
   does not know.
-- **One stream before a protocol.** When an invariant fits in one stream, keep
+- **One stream before a workflow.** When an invariant fits in one stream, keep
   it there. One design rejected a stream for each payment with two-phase
   holds, and compensating events, because its invariant fitted in one stream
   and a person's action in an outside system sat inside the window.
