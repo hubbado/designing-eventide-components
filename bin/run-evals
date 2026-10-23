@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Runs the eval suite against a copy of the skill that holds nothing else, so
+# that a run cannot read the work logs, and the evals never ship with the skill.
+# Options pass through to `claude plugin eval`, such as --runs or --model.
+set -euo pipefail
+
+repo=$(cd "$(dirname "$0")/.." && pwd)
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+target="$work/eval-target"
+mkdir -p "$target/.claude-plugin" "$target/skills" "$target/evals"
+cp -R "$repo/skills/designing-eventide-components" "$target/skills/"
+rsync -a --exclude results "$repo/evals/" "$target/evals/"
+printf '{ "name": "designing-eventide-components" }\n' > "$target/.claude-plugin/plugin.json"
+
+claude plugin eval "$target" --trust-plugin \
+  --output-dir "$repo/evals/results/$(date -u +%Y-%m-%d-%H%M%S)" "$@"
