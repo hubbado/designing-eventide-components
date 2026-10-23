@@ -35,11 +35,9 @@ Time runs from left to right.
 
 ## Steps
 
-1. Write and check the model. Draw only when the reviewer asks to see the
-   design.
-2. Copy [assets/event-flow-template.html](../assets/event-flow-template.html)
+1. Copy [assets/event-flow-template.html](../assets/event-flow-template.html)
    to the design's folder as `event-flows.html`. Change its `<title>`.
-3. Translate the model and the scenarios into the `window.DIAGRAM` block at
+2. Translate the model and the scenarios into the `window.DIAGRAM` block at
    the top of the file, with the rules below. The template's own data is the
    translation of the example in
    [examples/purchase-orders/](../examples/purchase-orders/). Compare them
@@ -47,7 +45,7 @@ Time runs from left to right.
    panels of the story. When you move a design into another form, such as the
    model into panels, say what the new form leaves out: a part that is left
    out without a word is lost.
-4. Check every panel. Serve the folder with
+3. Check every panel. Serve the folder with
    `python3 -m http.server 8765 --bind 127.0.0.1`, and open the page in a
    browser. A wrong lane or message id shows as a red message where the canvas
    should be. Then run
@@ -59,9 +57,9 @@ Time runs from left to right.
    panel once: the check cannot see whether a note sits next to the step that
    it explains. Looking alone is not enough either: the check has found
    overlaps that several rounds of looking had missed.
-5. Commit the model and the page beside the design document, and add their
+4. Commit the model and the page beside the design document, and add their
    links to the design document.
-6. Present it: the page, the panels in reading order with one line for each,
+5. Present it: the page, the panels in reading order with one line for each,
    and the decisions that you need. The model's `questions` show under the
    canvas. Then stop, and wait for the review before you draw more panels.
 
@@ -74,8 +72,11 @@ the proposal. `questions` are the model's `questions`.
 scenario as the overview, a panel for each area of the design that has
 something to decide, and another scenario only when its walk shows something
 that the area panels cannot, such as a fact that arrives before the thing it
-belongs to. The scenarios document holds every walk. A scenario panel's `name`
-is the scenario's name.
+belongs to. An area has something to decide when it has branches, refusals,
+an order of arrival, or a fan-out. A read model that every event updates in
+the same way is only a list of handlers. The model holds that list, and a
+scenario panel shows the read model at work. The scenarios document holds
+every walk. A scenario panel's `name` is the scenario's name.
 
 **The order of the panels.** The panels tell the component as a story, from
 the usual case to the details, as
@@ -84,11 +85,6 @@ scenario, the usual case, named "Overview: <scenario>". Any other scenario
 panels follow in the order of the scenarios document. A panel of one area of
 the design in full, drawn from its handlers rather than from one walk, comes
 after the stories that lead into that area.
-
-Draw a panel of one area only when it shows something to decide: branches,
-refusals, an order of arrival, or a fan-out. A read model that every event
-updates in the same way is only a list of handlers. The model holds that list,
-and a scenario panel shows the read model at work.
 
 **Lanes.** For each stream that the scenario's steps use, in the order of the
 model's `streams`: the stream's command lane, if a step is one of its
@@ -106,10 +102,9 @@ split into words: `AddToPurchaseOrder` becomes "Add To Purchase Order".
 `"addition_id?"` for an optional one, and
 `{ line_items: ["worker_id", "net_amount"] }` for a list of entries. Keep the
 order, so that the parts of an entry stay together and an optional attribute
-stays in its place. `rejected: true` goes on an event that has `reasons`. A
-step whose Data says that it is ignored gets a note that gives the reason, if
-the scenario has none. The Data column, `reads` and `owner` are not drawn; a
-note can quote a value from Data.
+stays in its place. A step whose Data says that it is ignored gets a note
+that gives the reason, if the scenario has none. The Data column, `reads` and
+`owner` are not drawn; a note can quote a value from Data.
 
 **Columns.** Take the steps in order.
 
@@ -238,7 +233,7 @@ leaves the side of the note that faces its target unless you say otherwise.
   not been tested.
 - The template has no `<!doctype>` and no character set of its own, because
   the host that it was first written for added them. It has been checked only
-  in Chrome, served as step 4 says.
+  in Chrome, served as step 3 says.
 - The template loads Excalidraw 0.17.6 from unpkg and React 18.3.1 from
   cdnjs. Excalidraw is pinned on purpose (30 Sep 2026). 0.17.6 is a browser
   build that sets a global and carries its own CSS. 0.18 is ESM only and ships
@@ -246,9 +241,3 @@ leaves the side of the note that faces its target unless you say otherwise.
   from some origins cannot load. Nobody has tried 0.18. If a later release
   runs in the hosts that serve the page, move to it and check that the
   template still draws.
-
-## Examples
-
-The example in [examples/purchase-orders/](../examples/purchase-orders/) and
-the data in [assets/event-flow-template.html](../assets/event-flow-template.html)
-are the same design, as a model, as scenarios and as panels.
