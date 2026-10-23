@@ -227,9 +227,11 @@ in this order:
   at his company who found a race condition in production. The prizes on the
   shelf went out of date, because nobody ever claimed one.
 - Then choose: remove it by changing the design so that it cannot happen;
-  guard it; detect it and correct it forward; or accept it, and name the
-  escape hatch. If the choice changes what a requirement promises, change its
-  words with the business, and have the reviewer agree them.
+  guard it; detect it and correct it forward; stop the line, when the cause
+  is wrong incoming data (the rule "Stop the line on incoming data that is
+  wrong"); or accept it, and name the escape hatch. If the choice changes
+  what a requirement promises, change its words with the business, and have
+  the reviewer agree them.
 
 When a walk shows that a requirement needs two streams to agree, look at the
 stream keys again before you add a workflow. A rule inside one stream is
