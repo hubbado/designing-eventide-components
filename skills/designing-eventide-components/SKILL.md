@@ -43,6 +43,14 @@ Stop and wait for the reviewer:
 - after the first one or two panels. The reviewer's questions on the first
   panels often change the foundations that the other panels stand on.
 
+At each stop, write for a reviewer who has seen only what you have shown
+them. Give each new or changed thing in full the first time that you show it:
+a requirement in its words, a candidate in its sketch, a problem in what goes
+wrong. An id alone is enough only for a thing that the reviewer has already
+seen in full. A reviewer cannot judge a name: one report gave five new
+requirements by their ids alone, and the reviewer could not tell whether any
+of them was wrong.
+
 ## Read these first
 
 - The feature's design document, if there is one.
@@ -130,13 +138,23 @@ Read `references/rules.md` and `references/model-format.md`.
   that candidate keeps that requirement: "one write", "a relay", "a protocol",
   "application only". Walk a scenario through a candidate only when the table
   does not decide.
-- Then stop, and present the candidates to the reviewer in the conversation:
-  the table, the candidate that you recommend, and why. Tell the reviewer
-  about each candidate that you would reject: its sketch in a few lines, what
-  it does better than the one that you recommend, and the row that rejects
-  it. A rejection that the reviewer can find only in the change log is a
-  decision that you made alone. The reviewer selects a candidate, or asks for
-  another.
+- Then stop, and present to the reviewer in the conversation, in this order,
+  so that nothing is compared before the reviewer has seen it:
+  1. Each requirement that changed since the reviewer last saw the
+     requirements, in its words, with each new assumption marked.
+  2. Each candidate, the one that you recommend first: a name that says its
+     idea, its sketch, and its main path walked through it with concrete
+     data, such as real ids and amounts.
+  3. The table, with a short label for each candidate as its column, the
+     words of each requirement beside its id, and what each cell word means.
+  4. The candidate that you recommend: the rows that decide it, and the cost
+     that you accept.
+  5. Each candidate that you would reject: what it does better than the one
+     that you recommend, and the row that rejects it. A rejection that the
+     reviewer can find only in the change log is a decision that you made
+     alone.
+
+  The reviewer selects a candidate, or asks for another.
 - Write the model only for the candidate that the reviewer selects. Record
   the choice in the design document's "Model selected". Record the
   candidates, the table, and each candidate dismissed, with why and when, in
