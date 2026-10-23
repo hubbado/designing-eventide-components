@@ -163,8 +163,9 @@ Read `references/rules.md` and `references/model-format.md`.
      its sketch and concrete data, such as real ids and amounts.
   3. The table, with a short label for each candidate as its column, the
      words of each requirement beside its id, and what each cell word means.
-  4. The candidate that you recommend: the rows that decide it, and the cost
-     that you accept.
+  4. The candidate that you recommend: the rows where it does better than
+     the others, and the cost that you accept. A row where every candidate
+     is the same decides nothing.
   5. Each candidate that you would reject: what it does better than the one
      that you recommend, and the row that rejects it. A rejection that the
      reviewer can find only in the change log is a decision that you made
