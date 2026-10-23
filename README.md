@@ -9,9 +9,13 @@ agent proposes and checks. You decide.
 The agent works through four stages with you:
 
 1. **Requirements.** What the process must and must not do, in the words of
-   the business. No streams or messages yet.
+   the business. No streams or messages yet. The agent names the
+   requirements that it assumed, asks what the request leaves open, and waits
+   for you.
 2. **Models.** More than one way to model the process with streams, compared
-   in a table. The model that is selected is written as YAML.
+   in a table. The agent tells you why it would reject each one that it does
+   not recommend, and waits for you to select one. Only the model that you
+   select is written as YAML.
 3. **Scenarios.** Walks that try to break the requirements: a message that
    arrives twice, late, out of order, or at the same time as another. Each
    problem that a walk finds gets a decision.

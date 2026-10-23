@@ -19,13 +19,25 @@ reviewer is the person who knows the business and owns the design. The
 reviewer decides:
 
 - the words of each requirement;
+- the other users of each thing that the process changes;
 - the components, and the streams that each one holds;
 - each problem that is accepted, and its escape hatch;
 - each question in the model's `questions` and the design document's Open;
 - a name, when no plain name fits a message.
 
+This is design with the reviewer, not for the reviewer. Do not build on a
+decision that the reviewer owns until the reviewer makes it. Work built on a
+guess is lost when the guess is wrong, and the reviewer can then only accept
+or reject it. For example, one design added a rule that its request did not
+make: a closed account refuses deposits. The model, its walks and a walk by a
+fresh session were built on that rule, and the two most serious problems that
+they found came from it alone.
+
 Stop and wait for the reviewer:
 
+- when you have the draft requirements, before any candidate model;
+- when you have the candidate models and their table, before you write the
+  model;
 - when you present the model, its scenarios and its questions;
 - before you draw any panel: draw panels only when the reviewer asks;
 - after the first one or two panels. The reviewer's questions on the first
@@ -83,10 +95,24 @@ rules are too strict.
 Look a little into the future. For each thing whose state the process
 changes, ask the reviewer which other processes change it now, and which are
 likely to need it to act later. Record the answers in the design document's
-"Other users". Until the reviewer answers, write what you expect, and put the
-question in Open. Do not design for them: they tell which components are
+"Other users". Do not design for them: they tell which components are
 afferent (the rule "Afferent components take commands, and efferent
 components orchestrate them").
+
+Then stop, and present the draft to the reviewer. Name each requirement that
+is your assumption and not the request's. Ask only the questions whose
+answers can change a stream, a component, or a requirement that a stream
+rests on, such as:
+
+- what each thing can do after it ends, such as a closed account, and what
+  happens to work that is in progress when it ends;
+- what the business does when a step fails after an earlier step has had an
+  effect. A request often says only what happens when the first step fails;
+- the other users above.
+
+State each other assumption, and continue on it. Continue on an assumption
+that can change the model only when the reviewer tells you to, and put its
+question in Open.
 
 ### 2. Candidate models, then the model
 
@@ -94,16 +120,28 @@ Read `references/rules.md` and `references/model-format.md`.
 
 - Consider more than one way to model the process with streams. They can be
   very different. A sketch is enough for a candidate: its streams, their
-  keys, and what each holds.
+  keys, what each holds, and the component of each stream.
+- Decide the components in the sketches, and not before: the reviewer's
+  answers to stage 1 must say what the process is first. Group the streams by
+  the rule "Afferent components take commands, and efferent components
+  orchestrate them".
 - Compare the candidates in a table. The requirements that decide where state
   lives are the rows, the candidates are the columns, and each cell says how
   that candidate keeps that requirement: "one write", "a relay", "a protocol",
   "application only". Walk a scenario through a candidate only when the table
   does not decide.
-- Select one, and write the model only for it. Record the choice in the
-  design document's "Model selected". Record the candidates, the table, and
-  each candidate that you dismiss, with why and when, in the change log. The
-  selected model can look obvious afterwards; the record shows why it is not.
+- Then stop, and present the candidates to the reviewer in the conversation:
+  the table, the candidate that you recommend, and why. Tell the reviewer
+  about each candidate that you would reject: its sketch in a few lines, what
+  it does better than the one that you recommend, and the row that rejects
+  it. A rejection that the reviewer can find only in the change log is a
+  decision that you made alone. The reviewer selects a candidate, or asks for
+  another.
+- Write the model only for the candidate that the reviewer selects. Record
+  the choice in the design document's "Model selected". Record the
+  candidates, the table, and each candidate dismissed, with why and when, in
+  the change log. The selected model can look obvious afterwards; the record
+  shows why it is not.
 - Before you propose a model, a rule or a name, read the change log for
   options already rejected. A rejected option comes back only when its reason
   no longer holds, and the proposal says which reason changed.
@@ -116,11 +154,6 @@ Read `references/rules.md` and `references/model-format.md`.
 - Write the whole component design in one model: every stream, message and
   handler that the requirements need. Each scenario then tests the whole
   design; do not build it from fragments that one scenario needs.
-- Decide the components when you write the model, and not before: the
-  requirements and "Other users" must say what the process is first. Group
-  the streams by the rule "Afferent components take commands, and efferent
-  components orchestrate them", and put each component, afferent or
-  efferent, to the reviewer in `questions`.
 
 ### 3. Try to break the requirements
 
@@ -167,7 +200,8 @@ components needs requests, replies and rejections. When no handler can keep a
 requirement at the moment of its decision, because the fact arrives after
 the decision, say so in a note, and say which handler reads the late fact and
 what it writes, or that none does. When a walk drops a shape of the model,
-add an entry to the change log.
+add an entry to the change log, and tell the reviewer about the shape and why
+it was dropped when you present the model.
 
 Some scenarios later become interactive tests: they run against the live
 components, and a person inspects their output.
