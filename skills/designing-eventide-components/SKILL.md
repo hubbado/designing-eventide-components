@@ -128,7 +128,11 @@ Read `references/rules.md` and `references/model-format.md`.
 
 - Consider more than one way to model the process with streams. They can be
   very different. A sketch is enough for a candidate: its streams, their
-  keys, what each holds, and the component of each stream.
+  keys, what each holds, and the component of each stream; for each stream,
+  the commands that it takes and the events that it writes; and for each
+  component, the commands that it sends and the events of other streams that
+  it handles. Leave out the attributes. The messages and the handlers show the
+  couplings that the row "Other users" judges.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
@@ -143,8 +147,8 @@ Read `references/rules.md` and `references/model-format.md`.
   1. Each requirement that changed since the reviewer last saw the
      requirements, in its words, with each new assumption marked.
   2. Each candidate, the one that you recommend first: a name that says its
-     idea, its sketch, and its main path walked through it with concrete
-     data, such as real ids and amounts.
+     idea, its sketch, and its main path walked through it with the names in
+     its sketch and concrete data, such as real ids and amounts.
   3. The table, with a short label for each candidate as its column, the
      words of each requirement beside its id, and what each cell word means.
   4. The candidate that you recommend: the rows that decide it, and the cost
