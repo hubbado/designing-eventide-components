@@ -72,15 +72,12 @@ model, and when you walk the scenarios.
 - **Handlers.** A handler reads messages, takes actions, writes messages,
   and refuses to write them. For each one, write what it reads (the message
   that it handles, and its entity), what actions it takes outside the store,
-  what it writes and sends, and what it ignores. A rejection is something it
-  writes: an event that something reacts to, such as the screen or the
-  component that sent the request. An ignore is a refusal: it writes nothing,
-  and logs. A guard that nothing downstream reacts to is a log-and-ignore,
-  not a rejection event. A command is ignored only when what it asks for is
-  already true. One that the handler cannot do is rejected, because the
-  sender waits for an answer, so no ignore applies in a state in which a
-  rejection applies. Say how the handler stays safe when its message arrives
-  twice.
+  what it writes and sends, and what it ignores. An ignore is a refusal: it
+  writes nothing, and logs. A guard that nothing downstream reacts to is a
+  log-and-ignore, not a rejection event. A command is ignored only when what
+  it asks for is already true. One that the handler cannot do is rejected,
+  because the sender waits for an answer, so no ignore applies in a state in
+  which a rejection applies.
 
 ## Streams, stores and state
 
@@ -139,8 +136,7 @@ component, where change is cheap.
 
 Which components are afferent is a fact of the business: how many processes
 change a thing, now and later. One design's requirements often name only one
-of them. So ask the reviewer about the future while you write the requirements,
-and record the answers in the design document's "Other users".
+of them.
 
 **Why:** a design put the transfer of money between two accounts in the
 account stream, with no stream for the transfer. The account then had
@@ -150,12 +146,9 @@ so that a deposit from another sender could not end a transfer. Every other
 process that moves money in or out of an account would add the same to the
 account.
 
-**In the model:** decide each new stream's `component` in the candidate
-sketches, after the reviewer has answered the questions on the requirements
-and "Other users". The reviewer selects the components with the candidate.
-After the walks, read the couplings again, and put each component, afferent
-or efferent, to the reviewer in `questions`, with the couplings that support
-it.
+**In the model:** after the walks, read the couplings again, and put each
+component, afferent or efferent, to the reviewer in `questions`, with the
+couplings that support it.
 
 ### A handler decides from the one thing that it writes
 
@@ -462,10 +455,9 @@ If the attribute repeats the message's name, remove the repeat.
 An event carries the context that a consumer needs to act on it alone: the
 parties, the kind of thing, the amounts and the lines, as the event that
 created the thing carried them. Do not cut an event down to an id because the
-other facts are in an earlier event. Messages are not normalized; they are
-contextualized. Add the context of the thing that changed, not the parameters
-that one consumer needs. An attribute shaped for one consumer is the same
-narrow message from the other side.
+other facts are in an earlier event. Add the context of the thing that
+changed, not the parameters that one consumer needs. An attribute shaped for
+one consumer is the same narrow message from the other side.
 
 The attributes of the message's own fact are another matter: each one needs a
 reader. Ask what reads it. If nothing does, it does not exist yet. Ask it also
@@ -929,5 +921,4 @@ From the purchase order example and the designs before it:
 - **Select by query, not by reaction.** Things that a person chooses from are
   shown from a read model built from this component's events, with their
   states computed at query time. Nothing gets stuck when messages arrive out
-  of order. The read model serves the screen. The command that the screen
-  sends carries what the handler needs from it.
+  of order.
