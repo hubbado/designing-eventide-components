@@ -172,7 +172,10 @@ Read `references/rules.md` and `references/model-format.md`.
      alone.
 
   The reviewer selects a candidate, or asks for another.
-- Write the model only for the candidate that the reviewer selects. Record
+- Write the model only for the candidate that the reviewer selects, and only
+  when the reviewer has agreed or corrected each assumption that can change
+  it. A selection does not answer an assumption: when the reviewer selects
+  and leaves one unanswered, ask again before you write the model. Record
   the choice in the design document's "Model selected". Record the
   candidates, the table, and each candidate dismissed, with why and when, in
   the change log. The selected model can look obvious afterwards; the record
