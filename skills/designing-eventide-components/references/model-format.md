@@ -140,8 +140,7 @@ handlers:
     ignores: [its addition_id is not the pending addition id]
 ```
 
-A handler reads messages, takes actions, writes messages, and refuses to
-write them. The fields say which:
+The fields of a handler:
 
 - `handles`: the message that the handler receives. It is a command to this
   component, or an event of this component or of another component.
