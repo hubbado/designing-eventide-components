@@ -56,9 +56,8 @@ In this order:
   of each problem goes in the change log: where and when it was found, the
   answers to the questions of stage 3, and the decision.
 - **Model selected.** What the model is, why it was chosen, and the costs
-  accepted. The candidates compared, their comparison table, and each model or
-  shape dismissed go in the change log, with what it was, why, and when. Add
-  an entry whenever a walk or a review drops a shape.
+  accepted. Each shape that a walk or a review drops goes in the change log,
+  with what it was, why, and when.
 
 ## Judging a design document
 
