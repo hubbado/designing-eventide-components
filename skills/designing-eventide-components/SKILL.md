@@ -105,7 +105,7 @@ changes, ask the reviewer which other processes change it now, and which are
 likely to need it to act later. Record the answers in the design document's
 "Other users". Do not design for them: they tell which components are
 afferent (the rule "Afferent components take commands, and efferent
-components orchestrate them").
+components coordinate them").
 
 Then stop, and present the draft to the reviewer. Name each requirement that
 is your assumption and not the request's. Ask only the questions whose
@@ -136,7 +136,7 @@ Read `references/rules.md` and `references/model-format.md`.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
-  orchestrate them".
+  coordinate them".
 - Compare the candidates in a table. The requirements that decide where state
   lives are the rows, the candidates are the columns, and each cell says how
   that candidate keeps that requirement, in one of these words:

@@ -9,7 +9,7 @@ model, and when you walk the scenarios.
 - The parts of a design
 - Streams, stores and state
   - A component never reads another component's store
-  - Afferent components take commands, and efferent components orchestrate them
+  - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - Reason about the entity, not about stream positions
   - An entity takes a recorded value from its event
@@ -115,7 +115,7 @@ decision needs data that another component owns, a scenario must show where
 that data arrived: an earlier step in which a handler of this component
 received the other component's event, or a command that carries the data.
 
-### Afferent components take commands, and efferent components orchestrate them
+### Afferent components take commands, and efferent components coordinate them
 
 A component's afferent couplings are the components that depend on it. Its
 efferent couplings are the components that it depends on. A component depends
@@ -132,10 +132,10 @@ it. It holds no message, attribute or state that only one of its users needs,
 such as an attribute that every other sender leaves empty.
 
 A component is efferent when it depends on many components, and few or none
-depend on it. It costs little to change. It tends to be an orchestrator: it
-sends commands to afferent components and handles their events. Put a
-process, and the state and guards that it needs, in an efferent component,
-where change is cheap.
+depend on it. It costs little to change. It tends to be a coordinating
+component: it sends commands to afferent components and handles their events.
+Put a process, and the state and guards that it needs, in an efferent
+component, where change is cheap.
 
 Which components are afferent is a fact of the business: how many processes
 change a thing, now and later. One design's requirements often name only one
