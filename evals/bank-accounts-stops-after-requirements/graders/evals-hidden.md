@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: eval-target/evals
-match: not_contains
+pattern: "graders/|prompt\\.md"
 target: trace
+match: not_contains
 ---
