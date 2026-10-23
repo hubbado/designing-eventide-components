@@ -94,7 +94,7 @@ is projected through one store class, with one entity class.
 
 **Why:** components are independent services with their own streams and
 stores, and they communicate only through messages. A read of another
-component's store couples the two, and it skips the protocol that protects the
+component's store couples the two, and it skips the workflow that protects the
 other component's invariants.
 
 **Why, also:** Eventide's entity cache and snapshots are not keyed by the
@@ -496,9 +496,9 @@ A consumer that cannot act on it alone must keep a copy of the earlier event's
 state, or read another component's store. One model kept a stream for each
 document only so that a `Voided` that carried just the document id could
 reach the stream that needed it. With the context on the upstream events,
-that stream and its relay handlers went. A reply on the Eventide Slack put
-it this way: "Messages aren't subject to normalization. They're subject to
-contextualization."
+that stream and the handlers that passed the void on went. A reply on the
+Eventide Slack put it this way: "Messages aren't subject to normalization.
+They're subject to contextualization."
 
 **In the model:** when the design needs context that an existing upstream
 event does not carry, change the upstream event. Do not add a stream to work
@@ -922,7 +922,7 @@ From the purchase order example and the designs before it:
 - **Pass a rejection through.** The requester's rejection copies the reasons
   of the reply. The screen must show a sensible message for a reason that it
   does not know.
-- **One stream before a protocol.** When an invariant fits in one stream, keep
+- **One stream before a workflow.** When an invariant fits in one stream, keep
   it there. One design rejected a stream for each payment with two-phase
   holds, and compensating events, because its invariant fitted in one stream
   and a person's action in an outside system sat inside the window.

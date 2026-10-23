@@ -139,9 +139,21 @@ Read `references/rules.md` and `references/model-format.md`.
   orchestrate them".
 - Compare the candidates in a table. The requirements that decide where state
   lives are the rows, the candidates are the columns, and each cell says how
-  that candidate keeps that requirement: "one write", "a relay", "a protocol",
-  "application only". Walk a scenario through a candidate only when the table
-  does not decide.
+  that candidate keeps that requirement, in one of these words:
+  - "inside one stream": one stream holds every fact that the rule needs. Its
+    handler checks the rule, and accepts or rejects the command, in one write
+    with `expected_version`, so nothing comes between the check and the
+    result.
+  - "across streams: a workflow of N steps": the facts are in more than one
+    stream, so a coordinating component sends commands and handles their
+    events, one step after another. Say which steps can be rejected. Between
+    two steps, one is done and the next is not.
+  - "a read model": the rule is checked against a read model, which can be
+    out of date, so two decisions at the same time can both pass.
+  - "the app only": no component checks the rule. The app checks it before it
+    sends the command.
+
+  Walk a scenario through a candidate only when the table does not decide.
 - Then stop, and present to the reviewer in the conversation, in this order,
   so that nothing is compared before the reviewer has seen it:
   1. Each requirement that changed since the reviewer last saw the
@@ -216,7 +228,7 @@ in this order:
   words with the business, and have the reviewer agree them.
 
 When a walk shows that a requirement needs two streams to agree, look at the
-stream keys again before you add a protocol. A rule inside one stream is
+stream keys again before you add a workflow. A rule inside one stream is
 cheap, because the stream orders its writes. A rule across streams or
 components needs requests, replies and rejections. When no handler can keep a
 requirement at the moment of its decision, because the fact arrives after
@@ -228,7 +240,7 @@ it was dropped when you present the model.
 Some scenarios later become interactive tests: they run against the live
 components, and a person inspects their output.
 
-**Think of it as a manual process.** Before you reach for a protocol, picture
+**Think of it as a manual process.** Before you reach for a workflow, picture
 the process done by hand, by people in a physical world, between desks and
 departments. Many processes were never done by hand, and a design does not
 have to copy a manual one. The picture is a way to think about races and
