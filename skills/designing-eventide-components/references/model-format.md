@@ -81,10 +81,9 @@ streams:
     proposed: [supplier_id, line_items]
   ```
 - `component` names the component that holds the stream. For a new stream,
-  decide it when you write the model, after the requirements and "Other
-  users" ("Afferent components take commands, and efferent components
-  orchestrate them" in [rules.md](rules.md)). An `existing` stream has its
-  component already.
+  it is the component of the candidate that the reviewer selected ("Afferent
+  components take commands, and efferent components orchestrate them" in
+  [rules.md](rules.md)). An `existing` stream has its component already.
 - The order of `streams` is the order of the lanes in every panel. Put the
   component that starts the flow first, and keep each component's streams
   together.
