@@ -1,5 +1,6 @@
 ---
 type: llm
 ---
-The reply ends by asking the reviewer to answer before the design goes on, and
-it does not present or compare candidate models.
+The reply asks the reviewer to answer before the design goes on. The request
+can be in any place in the reply. A reply that says it will go on without the
+answers fails.
