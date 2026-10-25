@@ -122,6 +122,10 @@ Ask each question in the words of the business, and do not say which streams
 or components an answer would lead to. That is a candidate, and a candidate
 shown before the answers leads the reviewer to the answer that fits it.
 
+When you show the draft in the conversation, keep each subject under its
+section, such as "Invoices" under "Component". A heading such as "Component:
+invoices" reads as a component that the reviewer has not decided.
+
 State each other assumption, and continue on it. Continue on an assumption
 that can change the model only when the reviewer tells you to, and put its
 question in Open.
