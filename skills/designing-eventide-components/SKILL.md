@@ -118,6 +118,10 @@ rests on, such as:
   effect. A request often says only what happens when the first step fails;
 - the other users above.
 
+Ask each question in the words of the business, and do not say which streams
+or components an answer would lead to. That is a candidate, and a candidate
+shown before the answers leads the reviewer to the answer that fits it.
+
 State each other assumption, and continue on it. Continue on an assumption
 that can change the model only when the reviewer tells you to, and put its
 question in Open.
