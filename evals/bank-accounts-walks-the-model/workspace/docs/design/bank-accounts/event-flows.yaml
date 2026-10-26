@@ -1,0 +1,141 @@
+# Event-flow model of bank accounts, with transfers between them.
+design: Bank accounts
+requirements: design.md
+scenarios: scenarios.md
+sources:
+  - The request, and the reviewer's answers in changes/
+
+streams:
+  account:
+    component: account_component
+    entity: Account
+    key: "{id}"
+    why: Holds its balance and whether it is open or closed, so each check and its result are one write.
+    commands:
+      Open: [account_id, customer_id, time, user_id?]
+      Deposit: [account_id, deposit_id, amount, time, user_id?]
+      Withdraw: [account_id, withdrawal_id, amount, time, user_id?]
+      Close: [account_id, time, user_id?]
+    events:
+      Opened: [account_id, customer_id, time, user_id?]
+      Deposited: [account_id, deposit_id, amount, balance, time, user_id?]
+      DepositRejected:
+        attributes: [account_id, deposit_id, amount, reason, data, user_id?]
+        reasons: [not_opened, closed]
+      Withdrawn: [account_id, withdrawal_id, amount, balance, time, user_id?]
+      WithdrawalRejected:
+        attributes: [account_id, withdrawal_id, amount, reason, data, user_id?]
+        reasons: [not_opened, closed, insufficient_funds]
+      Closed: [account_id, time, user_id?]
+      CloseRejected:
+        attributes: [account_id, reason, data, user_id?]
+        reasons: [balance_not_zero]
+
+  # The transfer sends each command with its own stream as the correlation
+  # stream, so each account event that the command causes names the transfer.
+  # The transfer's consumer reads only the account events that correlate to a
+  # transfer.
+  transfer:
+    component: transfer_component
+    entity: Transfer
+    key: "{id}"
+    why: Holds the stage of one transfer, so each step knows what it is waiting for.
+    commands:
+      Transfer: [transfer_id, source_account_id, destination_account_id, amount, time, user_id?]
+    events:
+      Initiated: [transfer_id, source_account_id, destination_account_id, amount, time, user_id?]
+      WithdrawalSent: [transfer_id, source_account_id, destination_account_id, amount, withdrawal_id]
+      Cancelled: [transfer_id, source_account_id, destination_account_id, amount, reason, data]
+      DepositSent: [transfer_id, source_account_id, destination_account_id, amount, deposit_id]
+      Completed: [transfer_id, source_account_id, destination_account_id, amount]
+      ReturnSent: [transfer_id, source_account_id, destination_account_id, amount, return_id, reason, data]
+      Failed: [transfer_id, source_account_id, destination_account_id, amount, reason, data]
+
+handlers:
+  # An account id is opened once, so a second Open is a copy.
+  - component: account_component
+    handles: Open
+    idempotence: state-guard
+    writes: [Opened]
+
+  - component: account_component
+    handles: Deposit
+    reads: [opened, closed]
+    idempotence: reservation
+    one_of:
+      - writes: [Deposited]
+      - when: never opened
+        writes: [DepositRejected]
+        reason: not_opened
+      - when: closed
+        writes: [DepositRejected]
+        reason: closed
+
+  - component: account_component
+    handles: Withdraw
+    reads: [opened, closed, balance]
+    idempotence: reservation
+    one_of:
+      - writes: [Withdrawn]
+      - when: never opened
+        writes: [WithdrawalRejected]
+        reason: not_opened
+      - when: closed
+        writes: [WithdrawalRejected]
+        reason: closed
+      - when: amount is more than the balance
+        writes: [WithdrawalRejected]
+        reason: insufficient_funds
+
+  # A closed account is never opened again, so a second Close is a copy.
+  - component: account_component
+    handles: Close
+    reads: [balance]
+    idempotence: state-guard
+    one_of:
+      - writes: [Closed]
+      - when: balance is not zero
+        writes: [CloseRejected]
+        reason: balance_not_zero
+
+  - component: transfer_component
+    handles: Transfer
+    idempotence: state-guard
+    writes: [Initiated]
+
+  # withdrawal_id is the transfer_id.
+  - component: transfer_component
+    handles: Initiated
+    sends: [Withdraw]
+    writes: [WithdrawalSent]
+
+  - component: transfer_component
+    handles: account.WithdrawalRejected
+    writes: [Cancelled]
+
+  # deposit_id is the transfer_id.
+  - component: transfer_component
+    handles: account.Withdrawn
+    sends: [Deposit]
+    writes: [DepositSent]
+
+  # The return is a Deposit into the source. return_id is a UUID v5 of the
+  # transfer_id. The return cannot be refused: the source held the money when
+  # the transfer withdrew it.
+  - component: transfer_component
+    handles: account.DepositRejected
+    reads: [deposit_id]
+    sends: [Deposit]
+    writes: [ReturnSent]
+    ignores: [its deposit_id is not the deposit into the destination]
+
+  - component: transfer_component
+    handles: account.Deposited
+    reads: [deposit_id, return_id]
+    one_of:
+      - when: the deposit into the destination
+        writes: [Completed]
+      - when: the return into the source
+        writes: [Failed]
+
+questions: []
