@@ -158,8 +158,11 @@ Read `references/rules.md` and `references/model-format.md`.
   coordinate them".
 - Compare the candidates in a table. The requirements that decide where state
   lives are the rows, the candidates are the columns, and each cell says how
-  that candidate keeps that requirement, or that it cannot, in one of these
-  words:
+  that candidate keeps that requirement, or that it cannot. Each cell starts
+  with one of these phrases, exactly as written, and can add a few words after
+  it. A reviewer judges many component designs, and different words in each
+  one make that hard. The same phrases make the communication clear and
+  repeatable, and the table quick to scan:
   - "inside one stream": one stream holds every fact that the rule needs. Its
     handler checks the rule, and accepts or rejects the command, in one write
     with `expected_version`, so nothing comes between the check and the
