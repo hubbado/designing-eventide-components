@@ -22,4 +22,4 @@ printf '{ "name": "designing-eventide-components" }\n' > "$target/.claude-plugin
 # a design that its own scaffold script copies into the workspace.
 claude plugin eval "$target" --trust-plugin --scaffold \
   --allow-tools Write Edit Bash --judge-model sonnet --ablation none \
-  --output-dir "$repo/evals/results/$(date -u +%Y-%m-%d-%H%M%S)" "$@"
+  --output-dir "$repo/evals/results/$(date -u +%Y-%m-%d-%H%M%S)-$$" "$@"
