@@ -40,11 +40,11 @@ for reply in "${replies[@]}"; do
     > "$c/prompt.md"
 done
 
-# Haiku only copies the reply, and Sonnet judges it, as bin/run-evals does.
-out="$repo/evals/results/replay-$(date -u +%Y-%m-%d-%H%M%S)"
+# Haiku only copies the reply, and Opus judges it, as bin/run-evals does.
+out="$repo/evals/results/replay-$(date -u +%Y-%m-%d-%H%M%S)-$$"
 status=0
 claude plugin eval "$work" --trust-plugin --scaffold --model haiku \
-  --judge-model sonnet --ablation none --no-publish -j 4 \
+  --judge-model opus --ablation none --no-publish -j 4 \
   --output-dir "$out" "$@" || status=$?
 
 # A verdict on a reply that Haiku changed says nothing about the stored reply.

@@ -16,10 +16,11 @@ rsync -a --exclude results "$repo/evals/" "$target/evals/"
 printf '{ "name": "designing-eventide-components" }\n' > "$target/.claude-plugin/plugin.json"
 
 # The file graders check files that a run writes, so the run needs Write, Edit
-# and Bash. Haiku, the harness's default judge, fails replies that meet their
-# criteria. No criterion compares a run with the skill to a run without it, so
-# the run without it only doubles the cost. A case of a later stage starts from
-# a design that its own scaffold script copies into the workspace.
+# and Bash. The judge is Opus: Haiku, the harness's default, failed replies that
+# met their criteria, and Sonnet failed them too on replies of 1,500 words or
+# more. No criterion compares a run with the skill to a run without it, so the
+# run without it only doubles the cost. A case of a later stage starts from a
+# design that its own scaffold script copies into the workspace.
 claude plugin eval "$target" --trust-plugin --scaffold \
-  --allow-tools Write Edit Bash --judge-model sonnet --ablation none \
+  --allow-tools Write Edit Bash --judge-model opus --ablation none \
   --output-dir "$repo/evals/results/$(date -u +%Y-%m-%d-%H%M%S)-$$" "$@"
