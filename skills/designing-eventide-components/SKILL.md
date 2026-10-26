@@ -35,7 +35,9 @@ they found came from it alone.
 
 Stop and wait for the reviewer:
 
-- when you have the draft requirements, before any candidate model;
+- when you have the draft requirements, and again after each round of answers
+  that leaves open a question that can change a stream, before any candidate
+  model;
 - when you have the candidate models and their table, before you write the
   model;
 - when you present the model, its scenarios and its questions;
@@ -121,6 +123,14 @@ rests on, such as:
 Ask each question in the words of the business, and do not say which streams
 or components an answer would lead to. That is a candidate, and a candidate
 shown before the answers leads the reviewer to the answer that fits it.
+
+When the reviewer answers, change the draft, and read the answers together.
+Two answers can leave open a case that neither one settles, such as an
+account that a customer can close during a transfer, and a transfer whose
+money must go back to that account. An answer can also add a new step, such
+as a payout, with cases of its own. Ask about each such case whose answer can
+change a stream, or a requirement that a stream rests on, and stop again. Go
+to stage 2 only when no such question is open.
 
 State each other assumption, and continue on it. Continue on an assumption
 that can change the model only when the reviewer tells you to, and put its
