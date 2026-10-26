@@ -133,7 +133,8 @@ account that a customer can close during a transfer, and a transfer whose
 money must go back to that account. An answer can also add a new step, such
 as a payout, with cases of its own. Ask about each such case whose answer can
 change a stream, or a requirement that a stream rests on, and stop again. Go
-to stage 2 only when no such question is open.
+to stage 2 only when no such question is open, or when the reviewer tells you
+to go on and leave it in Open.
 
 State each other assumption, and continue on it. Continue on an assumption
 that can change the model only when the reviewer tells you to, and put its
