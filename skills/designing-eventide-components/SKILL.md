@@ -92,13 +92,13 @@ Work in this order.
 
 Read `references/requirements-document.md`.
 
-Before any stream or message, write what the process must and must not do,
-in the words of the business. Define the terms first. Give each requirement a
-short id, and say where it is built: in the component, or in the application
-that sends its commands. The first version is a draft. Business people often
-state a rule more strictly than the business needs, because on paper the
-correction cost nothing and nobody saw it. The walks in stage 3 show which
-rules are too strict.
+Before any stream, message or component, write what the process must and
+must not do, in the words of the business. Define the terms first. Give each
+requirement a short id. Do not say yet whether a component or the application
+keeps it: the model decides that, in stage 2. The first version is a draft.
+Business people often state a rule more strictly than the business needs,
+because on paper the correction cost nothing and nobody saw it. The walks in
+stage 3 show which rules are too strict.
 
 Look a little into the future. For each thing whose state the process
 changes, ask the reviewer which other processes change it now, and which are
@@ -117,6 +117,10 @@ rests on, such as:
 - what the business does when a step fails after an earlier step has had an
   effect. A request often says only what happens when the first step fails;
 - the other users above.
+
+Ask each question in the words of the business, and do not say which streams
+or components an answer would lead to. That is a candidate, and a candidate
+shown before the answers leads the reviewer to the answer that fits it.
 
 State each other assumption, and continue on it. Continue on an assumption
 that can change the model only when the reviewer tells you to, and put its
@@ -180,6 +184,9 @@ Read `references/rules.md` and `references/model-format.md`.
   candidates, the table, and each candidate dismissed, with why and when, in
   the change log. The selected model can look obvious afterwards; the record
   shows why it is not.
+- When you write the model, move each requirement into the design document's
+  Component section when the model keeps it, and into its Application section
+  when only the application does.
 - Before you propose a model, a rule or a name, read the change log for
   options already rejected. A rejected option comes back only when its reason
   no longer holds, and the proposal says which reason changed.
