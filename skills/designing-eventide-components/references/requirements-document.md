@@ -27,13 +27,17 @@ In this order:
   whose void it has recorded" is a guard, and "a recovery MUST be owed" is a
   correction. When only a sysadmin can put a breach right, the requirement
   says so.
-- **Component** and **Application.** Two sections, by where each requirement
-  is built. The component keeps its requirements whoever sends the command.
-  The application holds its screens, and the rules that it applies before it
-  sends a command. Call such a rule an application rule, not a screen rule:
-  its text says what the application MUST do. Inside each section, group the
-  requirements by subject. Each one is a bold id and one or two sentences:
-  "**settled-once.** An item MUST be settled at most once."
+- **Requirements**, and later **Component** and **Application.** Until the
+  model is written, the requirements are one section, Requirements, and name
+  no component and no application: which one keeps a requirement is a
+  decision of the model. When the model is written, they move into two
+  sections, by where each requirement is built. The component keeps its
+  requirements whoever sends the command. The application holds its screens,
+  and the rules that it applies before it sends a command. Call such a rule an
+  application rule, not a screen rule: its text says what the application
+  MUST do. Inside each section, group the requirements by subject. Each one is
+  a bold id and one or two sentences: "**settled-once.** An item MUST be
+  settled at most once."
 - **Out of scope.** What the process does not do, in one line each, and who
   or what does it instead.
 - **Other users.** For each thing whose state the design changes, the other
