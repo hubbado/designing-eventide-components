@@ -125,8 +125,8 @@ change to it can reach every component that depends on it, so it is hard to
 change. Keep change in it to a minimum. It takes commands: each process that
 needs it sends it commands and handles its events, so a new process needs no
 change in it. It does not handle the events of the components that depend on
-it. It holds no message, attribute or state that only one of its users needs,
-such as an attribute that every other sender leaves empty.
+it. It holds no message, attribute or state that only one of the processes
+that use it needs, such as an attribute that every other sender leaves empty.
 
 A component is efferent when it depends on many components, and few or none
 depend on it. It costs little to change. It tends to be a coordinating

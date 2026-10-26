@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Grades stored replies with a case's llm graders, so that a changed criterion
+# can be checked against replies whose verdict is known, without a new run.
+# Usage: bin/replay-graders <case> <reply.md>... [-- <claude plugin eval options>]
+set -euo pipefail
+
+repo=$(cd "$(dirname "$0")/.." && pwd)
+case_dir="$repo/evals/$1"
+shift
+replies=()
+while [ $# -gt 0 ] && [ "$1" != "--" ]; do
+  replies+=("$(cd "$(dirname "$1")" && pwd)/$(basename "$1")")
+  shift
+done
+[ "${1:-}" = "--" ] && shift
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+mkdir -p "$work/.claude-plugin" "$work/evals"
+printf '{ "name": "replay" }\n' > "$work/.claude-plugin/plugin.json"
+
+i=0
+for reply in "${replies[@]}"; do
+  i=$((i + 1))
+  echo "reply-$i: $reply"
+  c="$work/evals/reply-$i"
+  mkdir -p "$c/graders" "$c/workspace"
+  cp "$reply" "$c/workspace/reply.md"
+  # A grader with a focus reads the run's files, which a stored reply does
+  # not have.
+  for g in "$case_dir"/graders/*.md; do
+    if grep -q '^type: llm' "$g" && ! grep -q '^focus:' "$g"; then
+      cp "$g" "$c/graders/"
+    fi
+  done
+  printf '#!/usr/bin/env bash\ncp "$(dirname "$0")/workspace/reply.md" .\n' > "$c/scaffold.sh"
+  printf 'schema_version: "1.1"\nname: reply-%s\ncontext:\n  scaffold_script: scaffold.sh\n' "$i" > "$c/case.yaml"
+  printf -- '---\nruns: 1\nmax_turns: 3\nallowed_tools: [Read]\n---\n%s\n' \
+    'Read reply.md. Your reply is the whole text of that file, unchanged, with no other words before or after it.' \
+    > "$c/prompt.md"
+done
+
+# Haiku only copies the reply, and Opus judges it, as bin/run-evals does.
+out="$repo/evals/results/replay-$(date -u +%Y-%m-%d-%H%M%S)-$$"
+status=0
+claude plugin eval "$work" --trust-plugin --scaffold --model haiku \
+  --judge-model opus --ablation none --no-publish -j 4 \
+  --output-dir "$out" "$@" || status=$?
+
+# A verdict on a reply that Haiku changed says nothing about the stored reply.
+python3 - "$out/aggregate-result.json" "${replies[@]}" <<'EOF'
+import json
+import sys
+
+result = json.load(open(sys.argv[1]))
+replies = sys.argv[2:]
+for case in result["cases"]:
+    i = int(case["name"].split("-")[1])
+    stored = open(replies[i - 1]).read().strip()
+    for run in case["arms"]["with"]:
+        sent = next((g["evidence"] for g in run["graders"] if g.get("evidence")), None)
+        if sent is not None and sent.strip() != stored:
+            print(f"warning: {case['name']} was not sent word for word; ignore its verdicts")
+EOF
+exit $status
