@@ -1,7 +1,6 @@
 # Bank accounts: requirements
 
-Draft. Stage 2: the reviewer has answered Q1 to Q6. Candidate models are
-proposed; none is selected. Q7 is open.
+Draft. Candidate models proposed; none selected yet.
 
 ## In brief
 
@@ -17,8 +16,14 @@ proposed; none is selected. Q7 is open.
 - When the withdrawal of a transfer is refused, the transfer is cancelled and
   nothing is deposited.
 - When the deposit of a transfer is refused, the money goes back into the
-  source, and the transfer fails. The customer is told why.
-- A transfer does not stop a customer from closing either account.
+  source, and the transfer fails. If the source refuses it too, the money goes
+  into the bank's suspense account.
+- The bank's staff pay each sum out of the suspense account, whole and
+  once, into another open account of the customer in this bank. When that
+  account refuses it, the sum stays owed. When the customer has no other
+  open account, the staff wait until the customer opens one.
+- A customer can close an account while a transfer from it or into it is
+  under way.
 
 ## Terms
 
@@ -27,20 +32,22 @@ proposed; none is selected. Q7 is open.
 - **Balance**: the money in an account: its deposits less its withdrawals.
 - **Deposit**: money put into an account.
 - **Withdrawal**: money taken out of an account.
-- **Refused**: a deposit, a withdrawal or a closing that has no effect, with a
-  reason.
-- **Open account**: an account that has been opened and is not closed.
-- **Closed account**: an account that its customer has closed. It is never
-  opened again.
+- **Refused**: a deposit or a withdrawal that has no effect on the balance,
+  with a reason.
+- **Closed account**: an account that its customer has closed. It is closed
+  for good.
 - **Transfer**: money moved from one account (the source) to another (the
   destination), by a withdrawal from the source and a deposit into the
   destination.
-- **Under way**: a transfer that has been asked for and is not yet completed,
-  cancelled or failed.
 - **Cancelled transfer**: a transfer whose withdrawal was refused. Nothing is
   deposited.
-- **Failed transfer**: a transfer whose deposit was refused. The money is
-  deposited back into the source.
+- **Failed transfer**: a transfer whose deposit was refused. Its money goes
+  back into the source, or into the suspense account.
+- **Suspense account**: the bank's own account for the money of failed
+  transfers that the source refused to take back. It holds each such sum on
+  its own.
+- **Payout**: the bank's staff paying one sum out of the suspense account,
+  whole, into another account of the customer in this bank.
 
 ## Keywords
 
@@ -55,32 +62,29 @@ Marked *(assumption)*: not in the request or the reviewer's answers.
 
 - **open.** The system MUST let a customer open an account.
 - **opens-empty.** An account MUST open with a balance of zero.
-- **close.** The system MUST let a customer close an open account whose
-  balance is zero.
+- **sterling.** Every account, deposit, withdrawal and transfer MUST be in
+  pounds sterling.
+- **close.** The system MUST let a customer close an account.
 - **close-empty.** An account MUST NOT be closed while its balance is not
-  zero. *(assumption)* The customer MUST be told why.
-- **closed-final.** A closed account MUST NOT be opened again.
+  zero.
 - **close-during-transfer.** The system MUST let a customer close an account
   while a transfer from it or into it is under way.
+- **closed-for-good.** A closed account MUST NOT be opened again.
+- **closed-refuses.** A closed account MUST refuse deposits and withdrawals.
+- **unknown-refuses.** *(assumption)* An account that was never opened MUST
+  refuse deposits and withdrawals, as a closed account does.
 
 ### Deposits and withdrawals
 
-- **deposit.** The system MUST let a customer deposit money into an open
-  account.
-- **withdraw.** The system MUST let a customer withdraw money from an open
-  account.
+- **deposit.** The system MUST let a customer deposit money into an account.
+- **withdraw.** The system MUST let a customer withdraw money from an account.
 - **positive-amount.** A deposit or a withdrawal MUST be of an amount greater
   than zero.
 - **no-overdraft.** A withdrawal MUST be refused when it is greater than the
   balance. A withdrawal of the whole balance is not refused; there is no
   overdraft.
-- **closed-refuses.** A deposit into a closed account, or a withdrawal from
-  it, MUST be refused.
-- **not-opened-refuses.** *(assumption)* A deposit into an account that has
-  not been opened, or a withdrawal from it, MUST be refused.
 - **refusal-reason.** When a deposit or a withdrawal is refused, the customer
-  MUST be told why. *(assumption: the request said this of withdrawals only;
-  deposits can now be refused too.)*
+  MUST be told why.
 - **once.** Each deposit and each withdrawal MUST change the balance at most
   once, however often it is asked for.
 
@@ -89,43 +93,75 @@ Marked *(assumption)*: not in the request or the reviewer's answers.
 - **transfer.** The system MUST let a customer transfer money from one of
   their accounts into any account in the bank: the amount is withdrawn from
   the source and deposited into the destination.
-- **transfer-distinct.** The source and the destination of a transfer MUST
-  NOT be the same account. The app does not let the customer choose that.
+- **not-same-account.** The source and the destination of a transfer MUST NOT
+  be the same account. The reviewer: the app does not let the customer choose
+  it.
 - **transfer-cancelled.** When the withdrawal of a transfer is refused, the
   transfer MUST be cancelled, and nothing MUST be deposited into the
   destination.
-- **transfer-failed.** When the deposit of a transfer is refused, the amount
+- **transfer-returned.** When the deposit of a transfer is refused, its money
   MUST be deposited back into the source, and the transfer MUST fail.
+- **transfer-suspense.** When the source refuses the money of a failed
+  transfer, the money MUST be put into the suspense account.
 - **transfer-reason.** When a transfer is cancelled or fails, the customer
-  MUST be told why.
-- **transfer-whole.** When the flow settles, a transfer MUST have deposited
-  into the destination exactly what it withdrew from the source, or deposited
-  all of it back into the source. Q7 waits on this.
+  MUST be told why. When its money is put into the suspense account, the
+  customer MUST be told that the bank's staff will pay it out.
+- **transfer-whole.** When the flow settles, the money of a transfer MUST be
+  in exactly one place: the destination, the source, or the suspense account.
+- **transfer-history.** A failed transfer MUST show in the source's history
+  as the money going out and coming back.
+
+### Suspense account
+
+- **suspense-kept.** The suspense account MUST be kept in this system.
+- **suspense-only-failed.** Only the money of failed transfers MUST go into
+  the suspense account.
+- **suspense-accepts.** The suspense account MUST NOT refuse money, and MUST
+  NOT be closed.
+- **suspense-owed.** The system MUST know each sum in the suspense account on
+  its own: the customer whose it is, and the transfer that it came from.
+- **payout.** The system MUST let the bank's staff pay a sum out of the
+  suspense account, whole, into another account of the customer in this bank.
+  The payout MUST be recorded as a withdrawal from the suspense account.
+- **payout-once.** Each sum MUST be paid out at most once.
+- **payout-refused.** When the account that the staff chose refuses a
+  payout, the sum MUST stay in the suspense account, still owed, and the
+  staff MUST be told why.
+- **payout-waits.** A sum MUST stay in the suspense account, owed, until it
+  is paid out. When the customer has no other open account in this bank, the
+  staff wait until the customer opens one.
 
 ## Out of scope
 
-- Other currencies: every account is in pounds sterling.
-- Overdrafts.
-- Card payments, direct debits, interest, fees and statements: later
-  processes (Other users).
+- Card payments, direct debits, interest and fees: later processes, below.
+- Paying money out of the bank, such as by cheque. A sum in the suspense
+  account is paid only into an account in this bank.
+- Statements: a later reader of each account's history.
+- Overdrafts and other currencies.
 
-## Other users
+## Other processes
 
-Of the account and its balance, as the reviewer knows them on 2026-10-26:
+For an account and its balance, as the reviewer knows them:
 
 - Now: only the customer's own deposits, withdrawals and transfers.
-- Within the year: card payments and direct debits take money out.
-- Within the year: each month the bank adds interest and takes fees.
-- Within the year: statements read each account's history.
+- Within the year: card payments will take money out. For its own design:
+  can a card payment be refused for want of balance after the card has been
+  used, or take the balance below zero? Can it reach an account that has
+  been closed since?
+- Within the year: direct debits will take money out. For its own design:
+  what happens to a direct debit on a closed account, and when one is
+  greater than the balance?
+- Within the year: each month, the bank will add interest. For its own
+  design: is interest added to an account that was closed during the month,
+  and how, when a closed account refuses deposits?
+- Within the year: each month, the bank will take fees. For its own design:
+  can a fee take the balance below zero, and must an account pay its fees
+  before it can be closed?
+- Within the year: statements will read each account's history.
 
 ## Open
 
-- **Q7, money that cannot go back** (transfer-failed, transfer-whole,
-  closed-refuses, close-during-transfer). A customer transfers the whole £120
-  of account 1001 into account 2002. The balance of 1001 is now zero, so the
-  customer closes it, as close-during-transfer allows. Account 2002 was closed
-  in the meantime, so the deposit is refused, and the £120 must go back into
-  1001 (transfer-failed). But 1001 is closed, and a closed account refuses
-  deposits (closed-refuses). Where does the £120 go, and what is the customer
-  told? For example: the closed account takes it back, and then holds money;
-  or the bank holds it for the customer and contacts them; or something else.
+- **payout.** Must the system refuse a payout into an account that is not
+  the customer's, or does the staff's screen offer only the customer's open
+  accounts? The candidates assume the screen does, as for
+  not-same-account.

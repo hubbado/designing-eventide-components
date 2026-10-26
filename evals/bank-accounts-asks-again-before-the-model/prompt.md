@@ -1,5 +1,5 @@
 ---
-description: When the reviewer selects a candidate and leaves a question that can change the model unanswered, the skill asks again, and writes no model.
+description: When the reviewer selects a candidate and leaves a question or an assumption that can change the model unanswered, the skill asks again, and writes no model.
 tags: [stage-2]
 runs: 3
 max_turns: 40
