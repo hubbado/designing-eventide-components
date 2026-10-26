@@ -3,9 +3,6 @@
 The scenarios that test the example model `event-flows.yaml`, in the format
 that [scenarios-format.md](../../references/scenarios-format.md) describes.
 
-In a step table, **Caused by** is the step whose handler writes or sends the
-message, or the user who sends a command from a screen.
-
 ## 1. An assignment is added to a purchase order, and later removed
 
 The usual case, from start to finish. A purchase order is created, and an assignment gets the same currency and client. The assignment asks the purchase order to add it, and records the answer. Later a user removes it. It tries to break no requirement.

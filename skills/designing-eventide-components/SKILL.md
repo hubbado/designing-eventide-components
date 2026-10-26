@@ -194,8 +194,6 @@ Read `references/rules.md` and `references/model-format.md`.
   for the decisions and rejections whose reasons rest on it, and test them
   again before you build on them. For example, a time zone on each start
   outlived its reason when the scope narrowed to one country.
-- When a decision makes the design simpler, "this is simpler if that", record
-  it at once (the rule "Record every 'simpler if' decision").
 - Write the whole component design in one model: every stream, message and
   handler that the requirements need. Each scenario then tests the whole
   design; do not build it from fragments that one scenario needs.
@@ -247,9 +245,6 @@ the decision, say so in a note, and say which handler reads the late fact and
 what it writes, or that none does. When a walk drops a shape of the model,
 add an entry to the change log, and tell the reviewer about the shape and why
 it was dropped when you present the model.
-
-Some scenarios later become interactive tests: they run against the live
-components, and a person inspects their output.
 
 **Think of it as a manual process.** Before you reach for a workflow, picture
 the process done by hand, by people in a physical world, between desks and
