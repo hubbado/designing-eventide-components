@@ -70,7 +70,7 @@ Marked *(assumption)*: not in the request.
 - **transfer-whole.** *(assumption)* When the flow settles, a transfer MUST
   have deposited exactly what it withdrew: all of it, or nothing.
 
-## Other users
+## Other processes
 
 To be answered by the reviewer, for the account and its balance.
 
@@ -90,7 +90,7 @@ To be answered by the reviewer, for the account and its balance.
 - **Q4, who can transfer** (transfer). Can a customer transfer only between
   their own accounts, or into any customer's account? Can the source and the
   destination be the same account?
-- **Q5, other users of an account** (Other users). Which other processes
+- **Q5, other processes that use an account** (Other processes). Which other processes
   change an account's balance now, such as fees, interest, card payments or
   direct debits? Which are likely to need it later, such as statements or
   overdrafts?

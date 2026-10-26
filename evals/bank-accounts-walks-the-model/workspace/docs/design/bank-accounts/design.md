@@ -99,10 +99,10 @@ checked. A permission is written as what the system MUST let a person do.
 - Overdrafts. No account goes below zero.
 - Other currencies. Every account is in pounds sterling.
 - Card payments, direct debits, interest and fees. They come later, as other
-  processes (Other users).
+  processes (Other processes).
 - Statements. They come later, and read each account's history.
 
-## Other users
+## Other processes
 
 For the account and its balance:
 

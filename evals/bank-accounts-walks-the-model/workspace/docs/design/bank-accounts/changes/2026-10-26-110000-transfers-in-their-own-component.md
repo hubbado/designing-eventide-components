@@ -16,13 +16,13 @@
   |---|---|---|---|
   | no-overdraft: a withdrawal greater than the balance is refused | inside one stream | inside one stream | inside one stream |
   | transfer-whole: the money is in the destination, or back in the source | across streams: a workflow of 3 steps | across streams: a workflow of 3 steps | across streams: a workflow of 2 steps |
-  | Other users: card payments, direct debits, interest and fees | the account needs no change | each new process adds handlers to the account component | each new process adds commands and state to the account stream |
+  | Other processes: card payments, direct debits, interest and fees | the account needs no change | each new process adds handlers to the account component | each new process adds commands and state to the account stream |
   | not-same-account: one account is not both the source and the destination | the app only | the app only | the app only |
 
 - [rejected] B. It keeps the handlers of a transfer next to the account, so a
   change to transfers is released with the account. Each new process that
   moves money would add its own handlers to the account component, which
-  Other users makes afferent.
+  Other processes makes afferent.
 - [rejected] C. It needs no transfer stream, and one step less. But the
   account gets transfer commands and events, and a list of its transfers in
   progress, which no other user of the account needs.

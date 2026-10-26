@@ -19,7 +19,8 @@ reviewer is the person who knows the business and owns the design. The
 reviewer decides:
 
 - the words of each requirement;
-- the other users of each thing that the process changes;
+- the other processes that change each thing that this process changes, now
+  and later;
 - the components, and the streams that each one holds;
 - each problem that is accepted, and its escape hatch;
 - each question in the model's `questions` and the design document's Open;
@@ -105,9 +106,11 @@ stage 3 show which rules are too strict.
 Look a little into the future. For each thing whose state the process
 changes, ask the reviewer which other processes change it now, and which are
 likely to need it to act later. Record the answers in the design document's
-"Other users". Do not design for them: they tell which components are
+"Other processes". Do not design for them: they tell which components are
 afferent (the rule "Afferent components take commands, and efferent
-components coordinate them").
+components coordinate them"). A question that only a later process needs goes
+in Other processes, beside that process, for its own design. Do not ask it
+now.
 
 Then stop, and present the draft to the reviewer. Name each requirement that
 is your assumption and not the request's. Ask only the questions whose
@@ -118,7 +121,7 @@ rests on, such as:
   happens to work that is in progress when it ends;
 - what the business does when a step fails after an earlier step has had an
   effect. A request often says only what happens when the first step fails;
-- the other users above.
+- the other processes above.
 
 Ask each question in the words of the business, and do not say which streams
 or components an answer would lead to. That is a candidate, and a candidate
@@ -146,7 +149,7 @@ Read `references/rules.md` and `references/model-format.md`.
   the commands that it takes and the events that it writes; and for each
   component, the commands that it sends and the events of other streams that
   it handles. Leave out the attributes. The messages and the handlers show the
-  couplings that the row "Other users" judges.
+  couplings that the row "Other processes" judges.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
@@ -309,7 +312,8 @@ Read the model and the scenarios against this list, item by item:
   category.
 - After the walks, no afferent component handles the events of a component
   that depends on it, or has a message, attribute or state that only one of
-  its users needs. Each component, afferent or efferent, is in `questions`.
+  the processes that use it needs. Each component, afferent or efferent, is
+  in `questions`.
 - Every handler is safe when its message arrives twice.
 - The cases of stage 3 (twice, at the same time, in a different order, late)
   have a scenario, or a note says why they cannot happen.
