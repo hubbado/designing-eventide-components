@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: bank-accounts-asks-what-the-answers-leave-open
+context:
+  scaffold_script: scaffold.sh
