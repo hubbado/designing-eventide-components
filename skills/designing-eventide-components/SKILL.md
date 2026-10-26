@@ -149,14 +149,17 @@ Read `references/rules.md` and `references/model-format.md`.
   the commands that it takes and the events that it writes; and for each
   component, the commands that it sends and the events of other streams that
   it handles. Leave out the attributes. The messages and the handlers show the
-  couplings that the row "Other processes" judges.
+  couplings that the row "Other processes" judges. Give each stream a line that
+  starts with its name and its component, such as "`purchaseOrder-{id}`, in
+  purchase_order_component:", also when the candidate has one component.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
   coordinate them".
 - Compare the candidates in a table. The requirements that decide where state
   lives are the rows, the candidates are the columns, and each cell says how
-  that candidate keeps that requirement, in one of these words:
+  that candidate keeps that requirement, or that it cannot, in one of these
+  words:
   - "inside one stream": one stream holds every fact that the rule needs. Its
     handler checks the rule, and accepts or rejects the command, in one write
     with `expected_version`, so nothing comes between the check and the
@@ -169,8 +172,14 @@ Read `references/rules.md` and `references/model-format.md`.
     out of date, so two decisions at the same time can both pass.
   - "the app only": no component checks the rule. The app checks it before it
     sends the command.
+  - "cannot keep it": the candidate breaks the requirement. Say how. The row
+    rejects the candidate, unless the reviewer changes the requirement.
+  - "does not arise": the candidate has no state in which the requirement can
+    break, such as a transfer that is one write. Say why.
 
-  Walk a scenario through a candidate only when the table does not decide.
+  The row "Other processes" is the exception: each of its cells says what
+  each later process would need changed in that candidate. Walk a scenario
+  through a candidate only when the table does not decide.
 - Then stop, and present to the reviewer in the conversation, in this order,
   so that nothing is compared before the reviewer has seen it:
   1. Each requirement that changed since the reviewer last saw the
@@ -179,7 +188,10 @@ Read `references/rules.md` and `references/model-format.md`.
      idea, its sketch, and its main path walked through it with the names in
      its sketch and concrete data, such as real ids and amounts.
   3. The table, with a short label for each candidate as its column, the
-     words of each requirement beside its id, and what each cell word means.
+     words of each requirement, or a short form of them, beside its id, and
+     what each cell word means. A requirement that every candidate keeps in
+     the same way decides nothing: leave it out of the table, and name it by
+     its id in one line under the table.
   4. The candidate that you recommend: the rows where it does better than
      the others, and the cost that you accept. A row where every candidate
      is the same decides nothing.
