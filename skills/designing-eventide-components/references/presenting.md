@@ -106,6 +106,15 @@ stays in its place. A step whose Data says that it is ignored gets a note
 that gives the reason, if the scenario has none. The Data column, `reads` and
 `owner` are not drawn; a note can quote a value from Data.
 
+**A message once.** A message is in its stream once, so it has one box, at
+its place in its stream's order, however many times a consumer handles it. A
+scenario's table can list a second handling as a step of its own, such as a
+message that a replay delivers again. The panel still draws that message
+once, because two boxes say that the stream holds it twice. The note on its
+box says what happens each time that it is handled, for example: "ignored
+when it first arrives, because the order is not open yet; the replay reads
+it again, and copies it".
+
 **Columns.** Take the steps in order.
 
 - The first step goes in column 0.
@@ -120,6 +129,9 @@ that gives the reason, if the scenario has none. The Data column, `reads` and
 - When one handler writes or sends several steps, list first the step that
   continues the flow onto other lanes. That step gets the straight arrow, and
   the others move to the right.
+- A step that a handler writes when it handles a message again, such as a
+  replay's copy, goes in the column of the time when it is written, to the
+  right of every column used before it, not in its cause's column.
 
 These rules give exactly the columns of every panel in the template.
 
@@ -134,6 +146,8 @@ These rules give exactly the columns of every panel in the template.
   When the step's Data names a branch, use that branch's `when`. A branch with
   no `when`, a command's success, has no label.
 - A step that is ignored has no link out, because its handler writes nothing.
+- A step written when a message is handled again links to that message's one
+  box, however far to its left the box is.
 
 **Notes.** One for each note in the scenario. Number the notes in the order in
 which they are to be read, which is the order of the first step that each one
@@ -172,6 +186,9 @@ positions:
   attribute, and by 20 more for each list.
 - `reads` arrows pass under the lowest lane. Put the notes for the lowest lane
   about 240 pixels below its centre, so that they sit below those arrows.
+- A `reads` arrow goes up into the bottom of the message that it reads. Put
+  the note on a message that is handled again above its lane, where that
+  arrow does not cross it.
 - Put each note in the gap next to the step it explains. Keep notes off
   arrows: move a note by a fraction of a column, or move an arrow's end with
   `fromAt`.
