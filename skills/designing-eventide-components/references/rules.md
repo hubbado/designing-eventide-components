@@ -245,7 +245,12 @@ in front: `invoice.Issued` becomes `InvoiceIssued`. It is a plain copy: the
 attributes of the stream's key first, then every attribute of the upstream
 event. The consumer chooses only the streams. It does not choose parts of the
 event or calculate, so that its one job stays simple; anything that follows is
-a handler of the copy. An `outside` read model is written only by handlers of
+a handler of the copy. The consumer that writes the copy is then one of
+several that write the stream, beside the stream's own consumers of its
+commands and events. Now and then two of them write with the same expected
+version, and one write fails. Its consumer retries the message ("Every
+handler is idempotent"), so such a conflict is expected, and is not a fault in
+the design. An `outside` read model is written only by handlers of
 this component's own events, or it is a genuine query across streams, with a
 note that says why.
 
@@ -718,13 +723,22 @@ after the payment".
 
 ### Guard only where it is strictly necessary
 
-A component cannot refuse an event that it subscribes to. The event is a fact
-from another component, so the component records it and corrects forward. A
-component can refuse a command, because a command asks it to decide. Even so,
-keep the refusals of commands to those that are strictly necessary, and leave
-the rest to the application or to a correction. A check that completes a set
-of checks on the same command may stay for consistency ("Design for least
-surprise and solubility").
+A stream gets a message from another stream in two ways: it subscribes to
+the other stream's events, or the other stream sends it a command. Nothing
+else is sent to a stream. A handler can refuse either, but the refusal means
+a different thing:
+
+- **A command** asks the stream to decide, so the stream is always free to
+  refuse it. Keep the refusals to those that are strictly necessary, and
+  leave the rest to the application or to a correction. A design is often
+  simpler when it is organised so that a command is never refused, because
+  then no sender has to plan for a refusal. A check that completes a set of
+  checks on the same command may stay for consistency ("Design for least
+  surprise and solubility").
+- **An event** is a fact in the stream that owns it. A subscriber can decline
+  to process it, but it cannot undo it: the fact stays in its own stream,
+  whatever the subscriber does. So a subscriber records the fact and corrects
+  forward.
 
 A command that records an action already taken in another system shows both
 sides. When the money that it records moves only later, it can still refuse:
