@@ -411,8 +411,16 @@ still say "Cancel agreement": this rule wins over the rule that a command's
 name is its screen label, because a reader of the stream must see that only a
 start was cancelled.
 
+An event's name never contains `Received`. Every event was received by
+something, so the word says only that a message came, which is transport, not
+a fact of the business. When a stream takes in a fact that another stream
+owns, its event names what the fact now is in that stream. For example, a
+worker's stream that takes in the worker's share of an invoice records the
+share as part of what the worker can be paid; it does not record that a share
+arrived.
+
 **In the model:** read each command and event name aloud, as the operator
-would say it. If it needs explaining, look for the word that the business
+would say it. No event's name contains `Received`. If it needs explaining, look for the word that the business
 uses. If no plain word fits, keep the name, and say why in a comment. If no
 name fits at all, look at the design first: separate what the message
 combines, or make clear what it does. When one round of names fails, do not
