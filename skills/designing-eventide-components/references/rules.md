@@ -16,6 +16,7 @@ model, and when you walk the scenarios.
   - A component holds its state in streams, not in an SQL database
   - A version-gated row takes updates from one category only
   - Every handler is idempotent, and the model says how
+  - Keep each component's streams tidy
   - An entity's collections stay small for the life of its stream
 - Messages
   - Name messages in plain business words
@@ -314,6 +315,33 @@ again.
 
 **In the model:** a handler that does not use the sequence check says which
 mechanism it uses, in `idempotence`.
+
+### Keep each component's streams tidy
+
+A handler does not write a message again when it can know that it already
+wrote it, even when the reader of the message would ignore the copy.
+Idempotence stops a copy from doing harm. Tidiness keeps the copy out of the
+stream.
+
+The usual case is a command sent to another component. The handler that sends
+it also records, in its own stream, that it sent it (`…Sent`). When a restart
+or a replay makes it handle the cause again, it finds that record and sends
+nothing. Send first, then record: a restart between the two sends the command
+again, which the receiver ignores by the command's id, but the other order
+would lose the command. So the receiver's idempotence is still needed.
+
+**Why:** a reader of a stream takes each message in it as something that
+happened. For example, a component sends AddItem to another component, and
+its consumer restarts and handles the cause again. Without a record of the
+send, it sends AddItem a second time. The receiver ignores the copy, so no
+figure is wrong. But its command stream now holds two AddItem commands for one
+addition, and the next person who reads that stream to find a fault must
+first find out which one acted.
+
+**In the model:** a handler that `sends` a command also `writes` its `…Sent`
+event, and its `idempotence` says how it finds that record. Usually that is
+the sequence check: the `…Sent` event follows the cause, so the cause's
+position is recorded.
 
 ### An entity's collections stay small for the life of its stream
 
