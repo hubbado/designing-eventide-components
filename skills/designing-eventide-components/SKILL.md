@@ -72,10 +72,17 @@ design's files together in one folder, such as `docs/design/<topic>/`:
 - `scenarios.md`: the walks that test the one against the other.
 - `event-flows.html`: the panels, drawn from the model.
 - `changes/`: the change log.
+- `dismissed/`: the model of each dismissed candidate that the reviewer asks
+  to keep, one file for each, in the model format.
 
 Every correction changes the requirements, the model or the scenarios first.
 If the panels and the model disagree, the model is right; fix the panels. A
 date belongs in the name of a plan for one piece of work, not of a design.
+
+The panels are a view, for a person to see the flows. A reader can throw them
+away and draw them again from the models and the scenarios, and lose nothing.
+So nothing exists only in a panel: each message, attribute and link that a
+panel draws is in a model first, the design's or a dismissed candidate's.
 
 The design document says what the design is now. The change log says how it
 got there, and why: one file for each change, named

@@ -78,6 +78,15 @@ the same way is only a list of handlers. The model holds that list, and a
 scenario panel shows the read model at work. The scenarios document holds
 every walk. A scenario panel's `name` is the scenario's name.
 
+**A dismissed design.** When the reviewer asks to keep a dismissed candidate
+as a panel, write its model first, in `dismissed/<name>.yaml`, in the model
+format. It holds the area that the panel draws in full, says in comments
+where the rest is as in the design's model, and names the change log entry
+that dismissed it. Draw the panel from that model, as the design's panels are
+drawn from `event-flows.yaml`, and name it "Dismissed design: <name>". Its
+notes say why the candidate was considered, what it would have given, and
+why it was not chosen. It comes after the design's panels.
+
 **The order of the panels.** The panels tell the component as a story, from
 the usual case to the details, as
 [scenarios-format.md](scenarios-format.md) says. The first panel is the first
