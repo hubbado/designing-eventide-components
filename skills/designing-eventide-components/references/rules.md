@@ -438,12 +438,23 @@ still say "Cancel agreement": this rule wins over the rule that a command's
 name is its screen label, because a reader of the stream must see that only a
 start was cancelled.
 
+An event's name is a fact of the business, never something mechanical that
+the message store or a consumer did. `ShareReceived`, for a message that came
+from another stream, is mechanical: every event was received by something, so
+the word says only that a message came. Receiving can be part of the business
+process, such as goods that a warehouse receives, and then `GoodsReceived` is
+the right name. When a stream takes in a fact that another stream owns, its
+copy names the fact, with its source in front ("A component holds its state in
+streams"): a void copied from a credit note's stream is `CreditNoteVoided`,
+not `CreditNoteVoidReceived`.
+
 **In the model:** read each command and event name aloud, as the operator
 would say it. If it needs explaining, look for the word that the business
 uses. If no plain word fits, keep the name, and say why in a comment. If no
 name fits at all, look at the design first: separate what the message
 combines, or make clear what it does. When one round of names fails, do not
-offer another. Say that no name fits, and ask what the message combines.
+offer another. Say that no name fits, and ask what the message combines. No
+event's name is mechanical, such as `Received` for a message that came.
 
 ### Say what is true now, in the words that people use
 
