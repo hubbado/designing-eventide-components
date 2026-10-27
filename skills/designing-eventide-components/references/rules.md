@@ -282,7 +282,10 @@ idempotence must be explicit. These are the mechanisms.
   consumer that may be replayed from an earlier position to pick up what it
   skipped, when the position is kept for each source category: the skipped
   message is now below the recorded position, and it is ignored as
-  processed. Such a consumer keeps the position for each source stream.
+  processed. Such a consumer keeps, beside the category's sequence, a
+  position for each source stream that the replay must bring in. A position
+  for every source stream would be a collection that grows ("An entity's
+  collections stay small").
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
   to a stream keyed by the original ids plus the key. A second copy finds
@@ -353,29 +356,48 @@ dates or a set of the documents that it has recorded, grows each time a
 message adds an entry. When the stream lives for years and the entries come
 with volume, the entity grows for years.
 
-Before an entity keeps a collection, know three things: what one entry holds,
-what adds an entry and how often, and how long the stream lives.
+Any collection that can grow for the life of the stream is a defect, however
+rare the event that adds an entry. A rare event still adds an entry that the
+entity must project and keep, and a design that allows one such collection
+soon has several. Keep only what a decision that is often made needs, and drop
+each entry when no such decision reads it again. A sequence kept for each
+source stream, for idempotence ("Every handler is idempotent"), is such a
+collection too. Two ways do most of the work:
 
-- Entries that come with a rare business act are safe. An agreement that
-  keeps each of its starts, with the end date of each, gains one entry each
-  time it starts again, a few times in its life. Such a collection can be the
-  smallest correct state: when the latest start can be cancelled and the one
-  before it then applies again, the entity cannot keep only the latest two.
-- Entries that come with volume are not safe: one for each invoice, payment
-  or source stream, on a stream that lives as long as the company. Keep only
-  the entries that a decision still reads, and drop each one when no decision
-  can read it again; or keep a total in place of the entries; or split the
-  stream by period, so that each stream ends.
-- A sequence kept for each source stream, for idempotence ("Every handler is
-  idempotent"), is such a collection.
+- **A stream of its own.** When a decision that is often made needs a fact
+  that a small key finds, the fact goes in a stream of its own, keyed by that
+  key: each person's part of a document, keyed by the person and the
+  document, or a claim on each period, keyed by the period. Such a stream
+  holds one thing, so it stays small. It records a fact that it owns, once,
+  or it holds a claim that a release frees, as the command reservation holds
+  a key that nothing frees. A state that other decisions change, such as
+  whether a part is paid, stays in the stream that makes those decisions:
+  moved out, each decision on several parts would become a protocol between
+  streams.
+- **A read of the stream that the handler writes.** A rare command that
+  needs an old fact, such as undoing a payment made months ago, reads it from
+  the stream that its handler writes, up to the version that its write
+  expects. It uses the message store's plain read, not the entity store,
+  whose cache would keep what it reads. One reader gives the state of the
+  parts that a command asks about, and makes no decision. Keep such reads
+  unusual: a decision that is made often decides from the entity.
+
+Growth that ends only when a person acts, such as the parts of someone whom
+nobody has set up yet, is a problem for the reviewer to accept or refuse, with
+its escape hatch ("Problems found").
 
 **Why:** an entity that grows shows no fault in the tests or at go-live. Its
-cost shows years later, as a consumer whose memory grows until it is stopped.
-Snapshots make a fetch shorter, but the entity in memory is the same size.
+cost shows years later, as a consumer whose memory grows until it is stopped,
+and in an event-sourced system such a defect is very hard to fix after the
+fact. Snapshots make a fetch shorter, but the entity in memory is the same
+size. An earlier version of this rule allowed a collection whose entries came
+with a rare business act. A design built that way soon had several, because
+the information has to be projected and stored however rare the event.
 
 **In the model:** a handler's `reads` names what the entity keeps. For each
-collection in it, the stream's comment says what adds an entry, how often,
-and what keeps the collection small.
+collection in it, the stream's comment says what keeps it small. A read of
+the stream that the handler writes is in `reads`, and a comment says why the
+path is unusual.
 
 ## Messages
 
