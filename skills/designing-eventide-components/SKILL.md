@@ -282,6 +282,13 @@ what it writes, or that none does. When a walk drops a shape of the model,
 add an entry to the change log, and tell the reviewer about the shape and why
 it was dropped when you present the model.
 
+When the fixes pile up, one workaround for each case on the same structure,
+the structure is the problem. Go back to stage 2: sketch a structure that
+removes the cause, and compare it in the table with the best version of the
+current design, not with the current design and its workarounds. A structure
+that wins only against the workarounds has not won. Record the one that you
+dismiss in the change log, as stage 2 says.
+
 **Think of it as a manual process.** Before you reach for a workflow, picture
 the process done by hand, by people in a physical world, between desks and
 departments. Many processes were never done by hand, and a design does not
