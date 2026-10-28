@@ -2,8 +2,8 @@
 description: A panel of a message that a consumer handles twice draws it once, and puts what the second handling writes later, linked back to that one box.
 tags: [stage-4]
 runs: 3
-max_turns: 100
-timeout_seconds: 3600
+max_turns: 60
+timeout_seconds: 1800
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
 ---
 

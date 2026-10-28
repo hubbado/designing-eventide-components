@@ -2,8 +2,8 @@
 description: Asked to keep a dismissed candidate as a panel, the skill writes its model in dismissed/ first, draws it after the overview, and draws a dashed arrow for every handler of an event.
 tags: [stage-4]
 runs: 3
-max_turns: 100
-timeout_seconds: 3600
+max_turns: 60
+timeout_seconds: 1800
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
 ---
 
