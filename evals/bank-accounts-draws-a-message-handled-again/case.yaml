@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: bank-accounts-draws-a-message-handled-again
+context:
+  scaffold_script: scaffold.sh
