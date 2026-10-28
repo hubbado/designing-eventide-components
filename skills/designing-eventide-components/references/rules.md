@@ -21,6 +21,7 @@ model, and when you walk the scenarios.
 - Messages
   - Name messages in plain business words
   - Say what is true now, in the words that people use
+  - Name each concept with a term or with the words of the business
   - Name attributes within their message
   - A message carries its context
   - Give at once what is known at once
