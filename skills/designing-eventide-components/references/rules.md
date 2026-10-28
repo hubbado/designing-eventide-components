@@ -32,6 +32,7 @@ model, and when you walk the scenarios.
   - Accept messages in any order of arrival
   - Write from what the stream knows
   - Guard only where it is strictly necessary
+  - Keep the component's facts true, and leave policy to people
   - A command's own attributes are checked by its validation
   - Stop the line on incoming data that is wrong
 - Simplicity
@@ -825,6 +826,31 @@ needs it, move the check to the application, or let the command through and
 correct forward. Before you propose a refusal, check it against the other
 rules here: a blank attribute is the command's validation, and a message can
 arrive in any order.
+
+### Keep the component's facts true, and leave policy to people
+
+A component refuses a command only to keep its own facts true: an item
+settled twice, money for a voided document, figures that disagree. It does
+not refuse a command to enforce how the business ought to operate, such as
+closing a book while some of its accounts are still open, or paying a person
+outside the payroll. Those are policies. The business decides them, they
+change, and a person can have a good reason to act against one. The component
+records what the person did, and what follows from it, truthfully. Whoever
+sends the command, a screen or the people who operate it, keeps the policy,
+and the design names what a person does to put a mistake right.
+
+**Why:** the edge cases of operation have no end, and each one that a
+component tries to stop costs a refusal, a reason, a scenario, and often a
+second guard to keep the first one true. One design could close a book from a
+time, and could not tell whether documents after that time were still to come.
+A guard would have needed the book to keep every document. The business
+decided that whoever closes the book checks first that its accounts have
+finished.
+
+**In the model:** for each refusal, ask whether it keeps one of the
+component's own facts true, or enforces a policy. Take out a refusal that
+enforces a policy. Leave the policy to the sender, and write it down in
+"Problems found" as a limitation, with its escape hatch.
 
 ### A command's own attributes are checked by its validation
 
