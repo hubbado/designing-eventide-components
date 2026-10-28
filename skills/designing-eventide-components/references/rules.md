@@ -338,8 +338,8 @@ nothing. Send first, then record: a restart between the two sends the command
 again, which the receiver ignores by the command's id, but the other order
 would lose the command. So the receiver's idempotence is still needed.
 
-When the receiver cannot refuse the command, the outcome is decided when the
-command is sent. Then the record of the send names the outcome. An assignment
+When the receiver cannot refuse the command, the outcome can be recorded
+when the command is sent. Then the record of the send names the outcome. An assignment
 that sends RemoveAssignment to a purchase order, which cannot refuse it,
 writes RemovedFromPurchaseOrder. A command that the receiver can refuse gets
 `…Sent`, because its outcome comes only with the receiver's answer.
