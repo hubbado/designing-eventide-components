@@ -43,10 +43,10 @@ window.DIAGRAM = {
       ],
       links: [
         { from: "add-to-po", to: "initiated" },
-        { from: "initiated", to: "add-assignment" },
-        { from: "initiated", to: "sent" },
+        { from: "add-assignment", to: "initiated", kind: "reads" },
+        { from: "sent", to: "initiated", kind: "reads" },
         { from: "add-assignment", to: "assignment-added" },
-        { from: "added-to-po", to: "assignment-added", kind: "reads" },
+        { from: "added-to-po", to: "assignment-added", kind: "reads", fromSide: "bottom", toSide: "bottom" },
         { from: "remove-from-po", to: "remove-assignment" },
         { from: "remove-from-po", to: "removed-from-po" },
         { from: "remove-assignment", to: "assignment-removed" }
@@ -97,12 +97,12 @@ window.DIAGRAM = {
       links: [
         { from: "add-to-po", to: "initiated" },
         { from: "add-to-po", to: "refused", label: "no currency or no client", toAt: 0.3 },
-        { from: "initiated", to: "add-assignment" },
-        { from: "initiated", to: "sent" },
+        { from: "add-assignment", to: "initiated", kind: "reads" },
+        { from: "sent", to: "initiated", kind: "reads" },
         { from: "add-assignment", to: "assignment-added" },
         { from: "add-assignment", to: "assignment-rejected", label: "currency or client differs" },
-        { from: "added-to-po", to: "assignment-added", kind: "reads", fromAt: 0.7 },
-        { from: "add-to-po-rejected", to: "assignment-rejected", kind: "reads", fromAt: 0.9 }
+        { from: "added-to-po", to: "assignment-added", kind: "reads", fromSide: "bottom", toSide: "bottom", fromAt: 0.7 },
+        { from: "add-to-po-rejected", to: "assignment-rejected", kind: "reads", fromSide: "bottom", toSide: "bottom", fromAt: 0.9 }
       ],
       notes: [
         { id: "requirements", column: 0.35, y: 20, width: 500, align: "left",
@@ -192,8 +192,8 @@ window.DIAGRAM = {
       ],
       links: [
         { from: "add-to-po", to: "initiated" },
-        { from: "initiated", to: "add-assignment" },
-        { from: "initiated", to: "sent" },
+        { from: "add-assignment", to: "initiated", kind: "reads" },
+        { from: "sent", to: "initiated", kind: "reads" },
         { from: "remove-from-po", to: "remove-assignment" },
         { from: "remove-from-po", to: "removed-from-po" },
         { from: "add-assignment", to: "assignment-added" },
@@ -291,8 +291,8 @@ window.DIAGRAM = {
     <ul class="legend">
       <li>A lane is a stream. Pale lanes hold commands, solid lanes hold events, and each component has its own colour. Grey dashed lanes are outside the event store.</li>
       <li>Time runs from left to right.</li>
-      <li>A solid arrow means the handler of this message writes that message.</li>
-      <li>A dashed arrow means a handler reacts to an event. It points at the event that is read.</li>
+      <li>A solid arrow means the handler of this command writes or sends that message.</li>
+      <li>A dashed arrow means a handler subscribes to an event, and writes or sends the message at the other end. It points at the event.</li>
       <li>A red title is a rejection. Grey attributes are optional.</li>
       <li>A name above a grey box is a list. Each entry in the list has the attributes in the box.</li>
       <li>Blue boxes are numbered notes.</li>
@@ -545,7 +545,7 @@ window.DIAGRAM = {
         var from = box[link.from], to = box[link.to];
         if (!from || !to) throw new Error("A link in " + panel.name + " names " + (from ? link.to : link.from) + ", which the panel does not have");
         var reads = link.kind === "reads";
-        var sides = reads ? ["bottom", "bottom"] : facingSides(from, to);
+        var sides = facingSides(from, to);
         var fromSide = link.fromSide || sides[0], toSide = link.toSide || sides[1];
         var start = at(from, fromSide, link.fromAt), end = at(to, toSide, link.toAt);
         var bend = link.bend !== undefined ? top + link.bend

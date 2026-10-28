@@ -24,8 +24,8 @@ and each column.
 | An attribute that ends in `?` | an entry in message `attrs` that ends in `?` | Grey attribute, in its place |
 | An attribute in braces, a list of entries | an entry `{ name: [parts] }` in message `attrs` | The list's name over a grey box, which holds the attributes of each entry |
 | An event with `reasons` | message `rejected: true` | Red title |
-| A step and the earlier step whose handler writes or sends it | link, `kind: "writes"` | Solid arrow |
-| A step written by a handler that handles another component's event | link, `kind: "reads"` | Dashed arrow. It points at the event that is read |
+| A step and the command whose handler writes or sends it | link, `kind: "writes"` | Solid arrow |
+| A step and the event whose handler writes or sends it: the handler subscribes to the event | link, `kind: "reads"` | Dashed arrow. It points at the event |
 | The `when` of a `one_of` branch | link `label` | Text on the arrow |
 | A note | note | Blue box, with thin arrows to what it explains |
 | A scenario chosen for a panel | panel | An Excalidraw frame with the scenario's name |
@@ -146,11 +146,11 @@ These rules give exactly the columns of every panel in the template.
 
 **Links.** One for each step that another step causes.
 
-- When the step's handler handles an event of another component, the link has
-  `kind: "reads"`, goes `from` the step `to` its cause, and points at the event
-  that is read.
-- Otherwise the link has `kind: "writes"` (the default) and goes `from` the
-  cause `to` the step.
+- When the step's handler handles an event, the link has `kind: "reads"`, goes
+  `from` the step `to` its cause, and points at the event. The handler
+  subscribes to the event, also when the event is in its own stream.
+- When the step's handler handles a command, the link has `kind: "writes"`
+  (the default) and goes `from` the cause `to` the step.
 - When the handler has `one_of`, the link's `label` is the branch's `when`.
   When the step's Data names a branch, use that branch's `when`. A branch with
   no `when`, a command's success, has no label.
@@ -193,9 +193,12 @@ positions:
   between two lanes. When a note sits above the first lane, put that lane's
   centre about 300 pixels down. A box grows by about 17 pixels for each
   attribute, and by 20 more for each list.
-- `reads` arrows pass under the lowest lane. Put the notes for the lowest lane
-  about 240 pixels below its centre, so that they sit below those arrows.
-- A `reads` arrow goes up into the bottom of the message that it reads. Put
+- A `reads` arrow that would cross a box on its way, such as an answer that
+  goes back to a lane above and to the right, passes under the lowest lane:
+  give it `fromSide: "bottom"` and `toSide: "bottom"`. Put the notes for the
+  lowest lane about 240 pixels below its centre, so that they sit below those
+  arrows.
+- Such an arrow goes up into the bottom of the message that it reads. Put
   the note on a message that is handled again above its lane, where that
   arrow does not cross it.
 - Put each note in the gap next to the step it explains. Keep notes off
@@ -226,11 +229,11 @@ the panel.
 from 0. Titles wrap by themselves; attributes show one on each line.
 
 **Link**: `{ from, to, kind, label, fromSide, fromAt, toSide, toAt, bend }`.
-Only `from` and `to` are necessary. A `writes` link runs straight when the two
-messages line up, and bends once when they do not. A `reads` link runs below
-the lowest lane of the panel; each one runs a little lower than the one before,
-so they do not overlap. `fromAt` and `toAt` (0 to 1, default 0.5) move an end
-along its side. `bend` sets the height of the horizontal run in pixels.
+Only `from` and `to` are necessary. A link runs straight when the two messages
+line up, and bends once when they do not. A `reads` link with `fromSide` and
+`toSide` both `"bottom"` runs below the lowest lane of the panel; each one runs
+a little lower than the one before, so they do not overlap. `fromAt` and
+`toAt` (0 to 1, default 0.5) move an end along its side. `bend` sets the height of the horizontal run in pixels.
 
 **Note**: `{ id, column, y, width, text, align, points }`. `column` is the
 note's centre and can be a fraction, such as `2.6`. `y` is its top edge. A
