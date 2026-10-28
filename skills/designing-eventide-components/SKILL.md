@@ -354,6 +354,10 @@ Read the model and the scenarios against this list, item by item:
   document, or the message classes when they exist. For an `existing` stream,
   read each class that you list. An attribute that the class does not have is
   in `proposed`.
+- Every word with a special meaning in the requirements, the model's comments
+  and conditions, and the scenario notes is an entry in Terms, and is used only
+  for what its entry says. Each consumer is named with its component and the
+  category that it reads.
 - When the design adds a state, every "latest", "last" and "current" in the
   requirements and the model is read again: the new state can make each one
   read two ways.

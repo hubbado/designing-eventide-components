@@ -502,6 +502,37 @@ meanings, and nobody notices until a reader asks what the word means.
 say it to the operator about the thing now. Where a word for a state means
 "the stream holds this event", say the state, or mark the history.
 
+### Name each concept with a term or with the words of the business
+
+A requirement, a comment, a condition, a note or a question to the reviewer
+names each concept with an entry in the design document's Terms, or with
+words that the business uses. Do not make a noun from a message, such as
+"the record" for an event `ExemptionRecorded`. Do not use a term that Terms
+defines for one thing for another thing, such as "stands", defined for a
+payment, said of a start. Do not write a handler's check out as prose, such
+as "while the latest start that stands has no end"; say the rule as the
+business says it: "while the arrangement is in force". When no business word
+fits, propose an entry for Terms to the reviewer.
+
+Words that only developers use, such as the name of a consumer, go in a part
+of Terms of their own. A consumer's name gives its component and the category
+that it reads, such as "billing's invoice consumer", because several
+components often read the same category.
+
+**Why:** a shorthand reads as the design's own word, so it spreads into the
+requirements, into the questions put to the reviewer, and into text that the
+reviewer approves. In one design, a noun cut from a message name appeared 62
+times before the reviewer asked what it meant, and the reviewer corrected four
+other shorthands in the same session. Each correction fixed one word, and the
+habit stayed. An audit by a new session then found 21 more.
+
+**In the requirements and the model:** before you write a sentence with a
+special word, read the word against Terms. A noun that only a message name
+gives, a term used for something that its entry does not say, and a consumer
+named without its component are each a fault. After a large change, a new
+session reads the documents for words that Terms does not define, because the
+author no longer sees their own shorthand.
+
 ### Name attributes within their message
 
 An attribute is named within the scope of its message. The message's name
