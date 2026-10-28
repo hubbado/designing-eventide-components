@@ -15,6 +15,14 @@ knows what goes wrong without it. Keep the example within the rule's scope,
 give it one lesson, and leave out the details of its fix: a second lesson
 reads as a second rule.
 
+Give a new rule a case in `evals/` that fails on the skill without the rule
+and passes with it. Write the case first, and run it with `bin/run-evals` to
+see it fail: a case that passes before the rule does not test the rule. A run
+shows what the text cannot: whether the agent loads the skill, and whether it
+keeps the rule in a design. A grader written from a rule has also found an
+example that broke the rule. A change that only corrects the words of a rule,
+or a list such as the contents, needs no case.
+
 A rule that holds for every Eventide design comes here, as a pull request. A
 rule of one organisation goes in that organisation's own document, as the
 README says.
