@@ -46,7 +46,7 @@ window.DIAGRAM = {
         { from: "add-assignment", to: "initiated", kind: "reads" },
         { from: "sent", to: "initiated", kind: "reads" },
         { from: "add-assignment", to: "assignment-added" },
-        { from: "added-to-po", to: "assignment-added", kind: "reads" },
+        { from: "added-to-po", to: "assignment-added", kind: "reads", fromSide: "bottom", toSide: "bottom" },
         { from: "remove-from-po", to: "remove-assignment" },
         { from: "remove-from-po", to: "removed-from-po" },
         { from: "remove-assignment", to: "assignment-removed" }
@@ -101,8 +101,8 @@ window.DIAGRAM = {
         { from: "sent", to: "initiated", kind: "reads" },
         { from: "add-assignment", to: "assignment-added" },
         { from: "add-assignment", to: "assignment-rejected", label: "currency or client differs" },
-        { from: "added-to-po", to: "assignment-added", kind: "reads", fromAt: 0.7 },
-        { from: "add-to-po-rejected", to: "assignment-rejected", kind: "reads", fromAt: 0.9 }
+        { from: "added-to-po", to: "assignment-added", kind: "reads", fromSide: "bottom", toSide: "bottom", fromAt: 0.7 },
+        { from: "add-to-po-rejected", to: "assignment-rejected", kind: "reads", fromSide: "bottom", toSide: "bottom", fromAt: 0.9 }
       ],
       notes: [
         { id: "requirements", column: 0.35, y: 20, width: 500, align: "left",
@@ -545,9 +545,7 @@ window.DIAGRAM = {
         var from = box[link.from], to = box[link.to];
         if (!from || !to) throw new Error("A link in " + panel.name + " names " + (from ? link.to : link.from) + ", which the panel does not have");
         var reads = link.kind === "reads";
-        // A reads link runs below the messages only when it would otherwise cross the panel on a slant.
-        var lined = from.x === to.x || from.y + from.h / 2 === to.y + to.h / 2;
-        var sides = reads && !lined ? ["bottom", "bottom"] : facingSides(from, to);
+        var sides = facingSides(from, to);
         var fromSide = link.fromSide || sides[0], toSide = link.toSide || sides[1];
         var start = at(from, fromSide, link.fromAt), end = at(to, toSide, link.toAt);
         var bend = link.bend !== undefined ? top + link.bend

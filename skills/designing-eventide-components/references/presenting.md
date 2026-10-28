@@ -193,9 +193,11 @@ positions:
   between two lanes. When a note sits above the first lane, put that lane's
   centre about 300 pixels down. A box grows by about 17 pixels for each
   attribute, and by 20 more for each list.
-- A `reads` arrow between two messages that do not line up passes under the
-  lowest lane. Put the notes for the lowest lane about 240 pixels below its
-  centre, so that they sit below those arrows.
+- A `reads` arrow that would cross a box on its way, such as an answer that
+  goes back to a lane above and to the right, passes under the lowest lane:
+  give it `fromSide: "bottom"` and `toSide: "bottom"`. Put the notes for the
+  lowest lane about 240 pixels below its centre, so that they sit below those
+  arrows.
 - Such an arrow goes up into the bottom of the message that it reads. Put
   the note on a message that is handled again above its lane, where that
   arrow does not cross it.
@@ -228,10 +230,10 @@ from 0. Titles wrap by themselves; attributes show one on each line.
 
 **Link**: `{ from, to, kind, label, fromSide, fromAt, toSide, toAt, bend }`.
 Only `from` and `to` are necessary. A link runs straight when the two messages
-line up, in one column or on one lane. When they do not, a `writes` link bends
-once, and a `reads` link runs below the lowest lane of the panel; each one
-runs a little lower than the one before, so they do not overlap. `fromAt` and `toAt` (0 to 1, default 0.5) move an end
-along its side. `bend` sets the height of the horizontal run in pixels.
+line up, and bends once when they do not. A `reads` link with `fromSide` and
+`toSide` both `"bottom"` runs below the lowest lane of the panel; each one runs
+a little lower than the one before, so they do not overlap. `fromAt` and
+`toAt` (0 to 1, default 0.5) move an end along its side. `bend` sets the height of the horizontal run in pixels.
 
 **Note**: `{ id, column, y, width, text, align, points }`. `column` is the
 note's centre and can be a fraction, such as `2.6`. `y` is its top edge. A
