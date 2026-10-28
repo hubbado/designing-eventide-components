@@ -31,7 +31,7 @@
   - Words of place failed again, as on 26 Oct (13:15): "stops there" and "or
     after it" were read as places in the reply.
   - A replay case, in which Haiku sends a stored reply word for word, tests a
-    criterion against the real judges for about $0.10 a reply.
+    criterion against the real judges.
 - [finding] In 6 of 6 runs whose answers allowed it, the skill found from the
   answers alone that a transfer's money can end in no account. The source is
   closed, empty, after the withdrawal, and then the destination refuses the
@@ -59,6 +59,5 @@
     grant in the harness.
   - The walks also found two faults in the fixture that were not planted: a
     Close of an account that was never opened, and a transfer of £0.00.
-- [finding] A stage-2 run cost $0.50 to $1.40, a resumed run $0.25, and a
-  stage-3 run $2.60 to $3.70 in 10 to 12 minutes. The work cost about $31.
+- [finding] A stage-3 run took 10 to 12 minutes.
 - [open] Stage 4, the panels, has no case.

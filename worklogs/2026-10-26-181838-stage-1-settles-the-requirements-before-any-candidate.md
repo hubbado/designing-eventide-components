@@ -74,9 +74,8 @@
   - A transcript and its files are scrubbed of the home paths, the email and
     the name before they go into the repository. The resume still works.
 - [decision] `bin/replay-graders` grades stored replies with a case's llm
-  graders, for about $1.30 a reply for the twelve graders of the candidates
-  case, with Opus. Each changed criterion was checked with it against replies
-  whose verdict was known.
+  graders, with Opus. Each changed criterion was checked with it against
+  replies whose verdict was known.
 - [finding] On the final text, the other five cases passed every check in
   every run, and the candidates case scored 0.89, 0.94 and 0.94. Each FAIL
   there is a reply that broke the skill's text.

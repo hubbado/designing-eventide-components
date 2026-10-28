@@ -19,7 +19,7 @@
   - It wrote the model only for the selected candidate. The change log named
     Sam Stickland as the person who selected it, from git config, although
     Claude gave the answers.
-  - It cost $6.51, with one session run again after a fault in the setup.
+  - One session was run again after a fault in the setup.
 - [learning] A test through several stops is `claude -p` for the first stop,
   then `claude -p --resume <session_id>` for each next one, from the same
   folder and with the same flags.
