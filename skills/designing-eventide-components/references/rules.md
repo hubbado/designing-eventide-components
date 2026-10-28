@@ -446,6 +446,13 @@ still say "Cancel agreement": this rule wins over the rule that a command's
 name is its screen label, because a reader of the stream must see that only a
 start was cancelled.
 
+Do not put the stream's name in front of its own events to tell them from
+another stream's events with the same name. The category tells them apart, as
+`invoice.Voided` and `creditNote.Voided` do; in the model and the scenarios,
+write the category in front where two streams have the name. The stream's name
+goes in front only on a copy in another stream, where it shows where the copy
+came from ("A component holds its state in streams").
+
 An event's name is a fact of the business, never something mechanical that
 the message store or a consumer did. `ShareReceived`, for a message that came
 from another stream, is mechanical: every event was received by something, so
