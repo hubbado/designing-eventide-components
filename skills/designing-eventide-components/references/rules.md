@@ -689,6 +689,13 @@ A shipment for an unknown order looks wrong. But if the shipment is recorded,
 the fact is kept whether the order arrives or not, and something can deal
 later with a shipment for an order that never arrived.
 
+When the stream must give a fact after the fact that it follows, record the
+early one as started, and let the handler of the later fact complete it. A
+void that arrives before its document is issued writes `VoidInitiated`, and
+the handler of `Issued` then writes `Voided`. Name the started fact
+`<Fact>Initiated`, so that a reader of the stream sees a process that has
+started and is not complete, and recognises the same case in every component.
+
 A command handler also tries to accept commands in any order. It balances
 that against two costs: the entity's own state must stay correct, and the
 complexity must stay low. Accept where it is cheap: a fact that only adds to
