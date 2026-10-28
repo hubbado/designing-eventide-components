@@ -338,6 +338,13 @@ nothing. Send first, then record: a restart between the two sends the command
 again, which the receiver ignores by the command's id, but the other order
 would lose the command. So the receiver's idempotence is still needed.
 
+When the receiver cannot refuse the command, the outcome can be recorded
+when the command is sent. Then the record of the send names the outcome. An
+assignment that sends RemoveAssignment to a purchase order, which cannot
+refuse it, writes RemovedFromPurchaseOrder. A command that the receiver can
+refuse gets `…Sent`, because its outcome comes only with the receiver's
+answer.
+
 **Why:** a reader of a stream takes each message in it as something that
 happened. For example, a component sends AddItem to another component, and
 its consumer restarts and handles the cause again. Without a record of the
@@ -347,9 +354,10 @@ addition, and the next person who reads that stream to find a fault must
 first find out which one acted.
 
 **In the model:** a handler that `sends` a command also `writes` its `…Sent`
-event, and its `idempotence` says how it finds that record. Usually that is
-the sequence check: the `…Sent` event follows the cause, so the cause's
-position is recorded.
+event, or the event of its outcome when the receiver cannot refuse the
+command. Its `idempotence` says how it finds that record. Usually that is the
+sequence check: the record follows the cause, so the cause's position is
+recorded.
 
 ### An entity's collections stay small for the life of its stream
 
