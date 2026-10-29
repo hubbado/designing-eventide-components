@@ -16,7 +16,7 @@
     transfers in progress, a transfer's id on its deposit, and a guard so that
     a deposit from another sender could not end a transfer.
   - It put the component choice to the reviewer as its first question.
-  - The first turn cost $10 and 92 model turns, most of them in two
+  - The first reply took 92 model turns, most of them in two
     fresh-context checks and the edits after them.
   - The session used the skill at 6525fd6, before the four pull requests
     merged later that day.

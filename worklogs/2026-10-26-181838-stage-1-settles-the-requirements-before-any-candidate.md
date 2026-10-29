@@ -62,7 +62,7 @@
     system prompt passed them 9 of 9.
   - The cause was not found: the harness's debug log holds no answer text.
   - Opus agreed with a reading of the replies on 24 of 24 verdicts. The
-    judge's cost about doubles.
+    judge's usage about doubles.
 - [decision] The candidates case starts from requirements settled over three
   rounds, with the reviewer's instruction to leave any other question in
   Open. With one round, it could never reach the candidates.
@@ -74,9 +74,8 @@
   - A transcript and its files are scrubbed of the home paths, the email and
     the name before they go into the repository. The resume still works.
 - [decision] `bin/replay-graders` grades stored replies with a case's llm
-  graders, for about $1.30 a reply for the twelve graders of the candidates
-  case, with Opus. Each changed criterion was checked with it against replies
-  whose verdict was known.
+  graders, with Opus. Each changed criterion was checked with it against
+  replies whose verdict was known.
 - [finding] On the final text, the other five cases passed every check in
   every run, and the candidates case scored 0.89, 0.94 and 0.94. Each FAIL
   there is a reply that broke the skill's text.

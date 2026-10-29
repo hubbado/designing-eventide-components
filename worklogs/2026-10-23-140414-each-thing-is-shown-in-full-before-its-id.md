@@ -37,7 +37,7 @@
   that sentence, followed the order: the changed requirements with each new
   assumption marked, three candidates each walked with a transfer of 30.00,
   the cell words explained, the Other users row as the reason, and what each
-  rejected candidate does better. It cost $2.73 over the two stops.
+  rejected candidate does better.
   - The table had a row for the rule "an entity's collections stay small",
     which rejected the ledger candidate: a design rule as a row again.
   - The agent cited the rule's Why about accounts: "The skill's rules contain

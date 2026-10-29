@@ -12,7 +12,7 @@
   - It wrote the model, with a component on every stream, before it walked any
     scenario, although the skill then said to leave the components out until
     the walks were done.
-  - Its first turn cost $6.20 and 35 model turns.
+  - Its first reply took 35 model turns.
 - [problem] The test was circular. The rule's Why tells of an account that
   held transfers, and the agent rejected that design by citing the Why: "records
   this exact cost". It shows that the agent applies the rule, not that the rule

@@ -26,9 +26,8 @@
   every check that the skill decides: it wrote `design.md`, wrote no model and
   no scenarios, asked about closed accounts, a refused deposit and other
   users, listed its assumptions, and waited for the reviewer.
-  - A run of stage 1 cost about $0.37 and 70 seconds, in 7 or 8 turns, with
-    Opus 5.5 as the agent and Sonnet 5.5 as the judge. The whole trial cost
-    $5.49.
+  - A run of stage 1 took about 70 seconds, in 7 or 8 turns, with Opus 5.5
+    as the agent and Sonnet 5.5 as the judge.
 - [problem] The case is not a clean test of the questions. The skill's own
   text now names a closed account twice, in the example under Roles and in the
   questions of stage 1, and the rule's Why tells of accounts and transfers.
