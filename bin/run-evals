@@ -10,7 +10,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 target="$work/eval-target"
-mkdir -p "$target/.claude-plugin" "$target/skills" "$target/evals"
+mkdir -p "$target/.claude-plugin" "$target/skills"
 cp -R "$repo/skills/designing-eventide-components" "$target/skills/"
 rsync -a --exclude results "$repo/evals/" "$target/evals/"
 printf '{ "name": "designing-eventide-components" }\n' > "$target/.claude-plugin/plugin.json"
@@ -22,5 +22,5 @@ printf '{ "name": "designing-eventide-components" }\n' > "$target/.claude-plugin
 # run without it only doubles the cost. A case of a later stage starts from a
 # design that its own scaffold script copies into the workspace.
 claude plugin eval "$target" --trust-plugin --scaffold \
-  --allow-tools Write Edit Bash --judge-model opus --ablation none \
+  --allow-tools Write Edit Bash --judge-model opus --ablation none -j 4 \
   --output-dir "$repo/evals/results/$(date -u +%Y-%m-%d-%H%M%S)-$$" "$@"
