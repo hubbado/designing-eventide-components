@@ -15,6 +15,10 @@ while [ $# -gt 0 ] && [ "$1" != "--" ]; do
   shift
 done
 [ "${1:-}" = "--" ] && shift
+# The check after the run reads the results from the script's own output dir.
+for a in "$@"; do
+  case $a in --output-dir|--output-dir=*) echo "--output-dir is set by this script" >&2; exit 1 ;; esac
+done
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT

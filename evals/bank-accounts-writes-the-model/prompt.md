@@ -1,5 +1,5 @@
 ---
-description: With a selected candidate and every question answered, the skill writes a model in which each handler that sends a command writes a record of the send, each collection says what keeps it small, and no event has a mechanical name.
+description: With a selected candidate and every question answered, the skill writes a model in which each handler that sends a command writes a record of the send, each collection says what keeps it small, and no event is named for its arrival, such as …Received.
 tags: [stage-2]
 runs: 3
 max_turns: 60

@@ -3,6 +3,6 @@ type: regex
 target:
   source: file
   path: docs/design/bank-accounts/scenarios.md
-pattern: "(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\bclose-when-empty\\b)(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\bclosed-refuses\\b)(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\bno-overdraft\\b)(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\bonce\\b)(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\btransfer-cancelled\\b)(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\btransfer-returned\\b)(?=[\\s\\S]*^Tests:(?:(?!Walked:)[\\s\\S])*?\\btransfer-whole\\b)"
+pattern: "(?=[\\s\\S]*^Tests:[^.]*?\\bclose-when-empty\\b)(?=[\\s\\S]*^Tests:[^.]*?\\bclosed-refuses\\b)(?=[\\s\\S]*^Tests:[^.]*?\\bno-overdraft\\b)(?=[\\s\\S]*^Tests:[^.]*?\\bonce\\b)(?=[\\s\\S]*^Tests:[^.]*?\\btransfer-cancelled\\b)(?=[\\s\\S]*^Tests:[^.]*?\\btransfer-returned\\b)(?=[\\s\\S]*^Tests:[^.]*?\\btransfer-whole\\b)"
 flags: m
 ---
