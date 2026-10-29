@@ -62,7 +62,7 @@
     system prompt passed them 9 of 9.
   - The cause was not found: the harness's debug log holds no answer text.
   - Opus agreed with a reading of the replies on 24 of 24 verdicts. The
-    judge's cost about doubles.
+    judge's usage about doubles.
 - [decision] The candidates case starts from requirements settled over three
   rounds, with the reviewer's instruction to leave any other question in
   Open. With one round, it could never reach the candidates.

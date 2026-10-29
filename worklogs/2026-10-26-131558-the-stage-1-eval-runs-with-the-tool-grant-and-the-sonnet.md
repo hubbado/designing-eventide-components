@@ -6,7 +6,7 @@
   - With Sonnet, every check except the two below passed in 24 of 24 runs.
 - [decision] `bin/run-evals` grants Write, Edit and Bash, judges with `sonnet`, and runs no ablation arm.
   - `sonnet` is an alias, so the judge floats; it resolved to claude-sonnet-5-5.
-  - [rejected] The ablation arm, which runs each case with no skill too. It doubles the cost, and no criterion compares the two arms.
+  - [rejected] The ablation arm, which runs each case with no skill too. It takes twice the runs, and no criterion compares the two arms.
   - [rejected] A fixed agent model. The default was Opus 5.5, and the skill is used with whatever model its user runs.
 - [finding] waits-for-the-reviewer still checked two behaviours, one of them the place of a sentence: "The reply ends by asking…".
   - The judges failed 3 of 12 replies that asked for the answers, but ended with a promise or a note on git.

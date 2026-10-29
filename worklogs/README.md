@@ -21,6 +21,9 @@ appending to one file always do.
 Commit each entry on its own. The message is the entry's first line, without
 the `# `.
 
+Give a run's size as its time or its turns, not as the price that
+`claude plugin eval` prints: that price is not what a subscription pays.
+
 Start each bullet with a tag that says what it is, such as `[decision]`,
 `[rejected]`, `[finding]`, `[problem]` or `[open]`.
 

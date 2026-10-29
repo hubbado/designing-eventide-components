@@ -31,7 +31,7 @@
   - Words of place failed again, as on 26 Oct (13:15): "stops there" and "or
     after it" were read as places in the reply.
   - A replay case, in which Haiku sends a stored reply word for word, tests a
-    criterion against the real judges.
+    criterion against the real judges without a new run.
 - [finding] In 6 of 6 runs whose answers allowed it, the skill found from the
   answers alone that a transfer's money can end in no account. The source is
   closed, empty, after the withdrawal, and then the destination refuses the
