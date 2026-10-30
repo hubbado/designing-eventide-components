@@ -38,6 +38,24 @@ In this order:
   MUST do. Inside each section, group the requirements by subject. Each one is
   a bold id and one or two sentences: "**settled-once.** An item MUST be
   settled at most once."
+- **Technical constraints.** The rules that the design keeps for technical
+  reasons, such as "no entity collection grows for the life of its stream" or
+  "every payment is one write on one stream". They go in this section, apart
+  from the requirements, because the requirements are in the words of the
+  business. A constraint can name a stream or an entity. List a constraint
+  when it shapes this design, such as when it rejects a candidate. Do not copy
+  every rule of [rules.md](rules.md). Each constraint is a bold id and one or
+  two sentences, and says what it protects, such as a consumer's memory. A
+  constraint can change what a requirement promises, or add a business rule.
+  That is a decision for the reviewer. Record it in the change log as a
+  trade-off that names the constraint and the requirement. Do not change the
+  requirement to fit the constraint until the reviewer agrees. An exception
+  to a constraint that the reviewer accepts is written under the constraint,
+  with its reason. In one design, a constraint that kept an entity's
+  collections small became a business rule: one kind of item stopped being
+  payable. Each edge case that followed got one more rule. A week went by
+  before anyone saw that the cause was a technical constraint, written as a
+  requirement.
 - **Out of scope.** What the process does not do, in one line each, and who
   or what does it instead.
 - **Other processes.** For each thing whose state the design changes, the
