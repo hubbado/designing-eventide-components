@@ -9,6 +9,7 @@ model, and when you walk the scenarios.
 - The parts of a design
 - Streams, stores and state
   - A component never reads another component's store
+  - A component is the authority over its own data
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - A decision that several entities must agree on is one write on one stream
@@ -58,7 +59,8 @@ model, and when you walk the scenarios.
   for a decision that the component owns is a plain verb. A command that
   records a fact decided outside the component, such as a payment made in
   another system, starts with `Record`, because the component is not the
-  authority for that fact.
+  authority for that fact ("A component is the authority over its own
+  data").
 - **Rejections.** A handler that refuses a command, from the entity's state,
   writes a rejection: an event that lists its reasons, so that the sender or
   the screen can react to it.
@@ -115,6 +117,34 @@ they must remember to set, is not a safeguard. (Checked in evt-entity_store
 decision needs data that another component owns, a scenario must show where
 that data arrived: an earlier step in which a handler of this component
 received the other component's event, or a command that carries the data.
+
+### A component is the authority over its own data
+
+A component is always the authoritative source over its own data. A decision
+about that data is written only by that component. Another component that
+needs the decision sends it a command and handles its answer, or handles its
+events. It never writes the decision itself. Inside a component, the same
+holds for its streams: one stream decides each fact.
+
+A component can keep a copy of another component's decision, as a consumer
+of its event ("A component holds its state in streams"). A copy does not
+decide. The stream that writes it never refuses it, because a refusal would
+be a second decision about the same fact. For the same reason, a command that
+records a fact decided in another system starts with `Record`: the component
+records the fact, and does not decide it.
+
+**Why:** two places that decide one fact can disagree, and then nothing says
+which one is true. In one design, the stream that decided payments was to
+write each payment's settlement into the stream of each item that it paid,
+and each item's stream could refuse it. Whether an item was paid was then
+decided in two streams, and the stream that decided the payment was not the
+authority over it.
+
+**In the model:** every event that records a decision is written by a
+handler of the component that owns the decision's data. A decision that
+another component needs reaches it as a command that it sends, with the
+answer that it handles, or as an event that it copies. No handler refuses a
+copy of another component's decision.
 
 ### Afferent components take commands, and efferent components coordinate them
 
