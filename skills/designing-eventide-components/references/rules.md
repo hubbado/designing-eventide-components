@@ -9,8 +9,10 @@ model, and when you walk the scenarios.
 - The parts of a design
 - Streams, stores and state
   - A component never reads another component's store
+  - A component is the authority over its own data
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
+  - A decision and what follows from it are one write
   - Reason about the entity, not about stream positions
   - An entity takes a recorded value from its event
   - A component holds its state in streams, not in an SQL database
@@ -57,7 +59,8 @@ model, and when you walk the scenarios.
   for a decision that the component owns is a plain verb. A command that
   records a fact decided outside the component, such as a payment made in
   another system, starts with `Record`, because the component is not the
-  authority for that fact.
+  authority for that fact ("A component is the authority over its own
+  data").
 - **Rejections.** A handler that refuses a command, from the entity's state,
   writes a rejection: an event that lists its reasons, so that the sender or
   the screen can react to it.
@@ -114,6 +117,34 @@ they must remember to set, is not a safeguard. (Checked in evt-entity_store
 decision needs data that another component owns, a scenario must show where
 that data arrived: an earlier step in which a handler of this component
 received the other component's event, or a command that carries the data.
+
+### A component is the authority over its own data
+
+A component is always the authoritative source over its own data. A decision
+about that data is written only by that component. Another component that
+needs the decision sends it a command and handles its answer, or handles its
+events. It never writes the decision itself. Inside a component, the same
+holds for its streams: one stream decides each fact.
+
+A component can keep a copy of another component's decision, as a consumer
+of its event ("A component holds its state in streams"). A copy does not
+decide. The stream that writes it never refuses it, because a refusal would
+be a second decision about the same fact. For the same reason, a command that
+records a fact decided in another system starts with `Record`: the component
+records the fact, and does not decide it.
+
+**Why:** two places that decide one fact can disagree. For example, a
+transfer component keeps a copy of each account's balance, and refuses a
+transfer that its copy cannot cover. The account has just taken a deposit
+that the copy has not seen yet. The transfer component decides that the
+balance does not cover the transfer, while the account would decide that it
+does, and the customer is refused for money that the account holds.
+
+**In the model:** every event that records a decision is written by a
+handler of the component that owns the decision's data. A decision that
+another component needs reaches it as a command that it sends, with the
+answer that it handles, or as an event that it copies. No handler refuses a
+copy of another component's decision.
 
 ### Afferent components take commands, and efferent components coordinate them
 
@@ -180,6 +211,45 @@ writes the stream that it decides from cannot be separated from it.
 **In the model:** `reads` lists the state of that one entity or row that the
 decision uses: `reads: [pending_addition_id]`. A handler that decides nothing
 has no `reads`.
+
+### A decision and what follows from it are one write
+
+When a decision has facts that follow from it, the handler that makes the
+decision writes them all in one write. For example, a void of a document and
+the recovery that the void makes owed, or a payment and the settlement of
+each item that it pays.
+
+Do not write the decision alone, and leave what follows to a handler that
+subscribes to its event. Between the write of that event and its handling,
+the component can take another command or event. The entity is then in a
+state between the two: the decision is recorded, and what follows from it is
+not. Each handler must then consider that state, and what to do with a
+message that arrives in it. One write removes that state, so no handler has
+to consider it.
+
+One write goes to one stream. So the stream that decides also holds the
+state of what follows, such as each open item that a payment can settle.
+"An entity's collections stay small for the life of its stream" still
+applies: the entity drops each item when no decision reads it again. When
+many items can be open at the same time, the one stream is still large. That
+is a trade-off for the reviewer. Give both costs: the size of the one stream,
+and the states between writes that a split would add.
+
+When what follows is another component's data, it cannot be in the same
+write ("A component is the authority over its own data"). The other component
+decides it from the event or from a command, and the scenarios walk the
+messages that can arrive in between.
+
+**Why:** for example, a handler writes the void of a document that was paid.
+A handler that subscribes to the void then writes the recovery that the void
+makes owed. A payment that arrives between the two writes finds no recovery
+to take off, so it pays too much. Every handler that pays must then check for
+a void whose recovery is not written yet.
+
+**In the model:** a handler that writes a decision `writes` each fact of this
+component that follows from it, in the same write. A handler of the
+component's own event that writes what follows from that event is a split:
+join the two writes, or say in a comment why the state between them is safe.
 
 ### Reason about the entity, not about stream positions
 
@@ -388,7 +458,7 @@ collection too. Two ways do most of the work:
   a key that nothing frees. A state that other decisions change, such as
   whether a part is paid, stays in the stream that makes those decisions:
   moved out, each decision on several parts would become a protocol between
-  streams.
+  streams ("A decision and what follows from it are one write").
 - **A read of the stream that the handler writes.** A rare command that
   needs an old fact, such as undoing a payment made months ago, reads it from
   the stream that its handler writes, up to the version that its write
