@@ -12,7 +12,7 @@ model, and when you walk the scenarios.
   - A component is the authority over its own data
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
-  - A decision that several entities must agree on is one write on one stream
+  - A decision and what follows from it are one write
   - Reason about the entity, not about stream positions
   - An entity takes a recorded value from its event
   - A component holds its state in streams, not in an SQL database
@@ -212,46 +212,45 @@ writes the stream that it decides from cannot be separated from it.
 decision uses: `reads: [pending_addition_id]`. A handler that decides nothing
 has no `reads`.
 
-### A decision that several entities must agree on is one write on one stream
+### A decision and what follows from it are one write
 
-Some decisions are correct only when several entities agree at the same time.
-For example, a payment that settles several items is correct only when no
-other payment has settled any of them. Make such a decision on one stream, in
-one write. Choose the stream's key so that the stream holds the state of each
-entity that the decision reads, such as the account that the items are owed
-on. The handler checks each entity, and writes the result with
-`expected_version`. So no other command comes between the check and the
-result. Two decisions about one entity cannot both pass: the second write
-conflicts, and its retry sees the first.
+When a decision has facts that follow from it, the handler that makes the
+decision writes them all in one write. For example, a void of a document and
+the recovery that the void makes owed, or a payment and the settlement of
+each item that it pays.
 
-A process across streams, with one stream for each entity, needs a reason
-that outweighs what it costs. It holds each entity, records the decision, and
-releases the holds when a step is refused. Each entity gets a held state, and
-each release is a compensating event ("Compensating events are a warning").
-When no key can put the entities in one stream, such as a transfer between
-any two accounts of a bank, that is the reason, and the design accepts the
-costs.
+Do not write the decision alone, and leave what follows to a handler that
+subscribes to its event. Between the write of that event and its handling,
+the component can take another command or event. The entity is then in a
+state between the two: the decision is recorded, and what follows from it is
+not. Each handler must then consider that state, and what to do with a
+message that arrives in it. One write removes that state, so no handler has
+to consider it.
 
-One stream can make its entity hold more, such as each open item of an
-account. "An entity's collections stay small for the life of its stream"
-still applies: the entity drops each item when no decision reads it again,
-such as when it is settled. When many items can be open at the same time, the
-one stream is still large. That is a trade-off for the reviewer. Give both
-costs: the size of the one stream, and the holds, the releases and the
-decisions that cross in the process.
+One write goes to one stream. So the stream that decides also holds the
+state of what follows, such as each open item that a payment can settle.
+"An entity's collections stay small for the life of its stream" still
+applies: the entity drops each item when no decision reads it again. When
+many items can be open at the same time, the one stream is still large. That
+is a trade-off for the reviewer. Give both costs: the size of the one stream,
+and the states between writes that a split would add.
+
+When what follows is another component's data, it cannot be in the same
+write ("A component is the authority over its own data"). The other component
+decides it from the event or from a command, and the scenarios walk the
+messages that can arrive in between.
 
 **Why:** a design compared two ways to settle several items in one payment.
-In one, the payment was one write on the stream that held the items. In the
-other, a process held each item in its own stream, recorded the payment, and
-released the holds on a refusal. The process cost several times the
-messages, and added states to each item. Two payments that crossed, each
-holding some of the same items, could both be refused. A variant that found
-a second payment only after the fact could record an item paid twice.
+In one, the payment and the settlement of its items were one write. In the
+other, the payment was recorded first, and then each item's stream held the
+item, settled it, or released it. Each item then had a held state. A void
+that arrived while an item was held could not be decided: the item was
+neither paid nor free. Every handler of the items had to consider that state.
 
-**In the model:** for each requirement that needs several entities to agree,
-such as an item settled at most once, name the stream whose one write keeps
-it. When a candidate keeps it across streams, its cell in the table names the
-reason that outweighs the holds and the releases.
+**In the model:** a handler that writes a decision `writes` each fact of this
+component that follows from it, in the same write. A handler of the
+component's own event that writes what follows from that event is a split:
+join the two writes, or say in a comment why the state between them is safe.
 
 ### Reason about the entity, not about stream positions
 
@@ -460,8 +459,7 @@ collection too. Two ways do most of the work:
   a key that nothing frees. A state that other decisions change, such as
   whether a part is paid, stays in the stream that makes those decisions:
   moved out, each decision on several parts would become a protocol between
-  streams ("A decision that several entities must agree on is one write on
-  one stream").
+  streams ("A decision and what follows from it are one write").
 - **A read of the stream that the handler writes.** A rare command that
   needs an old fact, such as undoing a payment made months ago, reads it from
   the stream that its handler writes, up to the version that its write
@@ -1142,6 +1140,10 @@ From the purchase order example and the designs before it:
 - **Pass a rejection through.** The requester's rejection copies the reasons
   of the reply. The screen must show a sensible message for a reason that it
   does not know.
+- **One stream before a workflow.** When an invariant fits in one stream, keep
+  it there. One design rejected a stream for each payment with two-phase
+  holds, and compensating events, because its invariant fitted in one stream
+  and a person's action in an outside system sat inside the window.
 - **Select by query, not by reaction.** Things that a person chooses from are
   shown from a read model built from this component's events, with their
   states computed at query time. Nothing gets stuck when messages arrive out
