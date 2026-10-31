@@ -133,12 +133,12 @@ be a second decision about the same fact. For the same reason, a command that
 records a fact decided in another system starts with `Record`: the component
 records the fact, and does not decide it.
 
-**Why:** two places that decide one fact can disagree, and then nothing says
-which one is true. In one design, the stream that decided payments was to
-write each payment's settlement into the stream of each item that it paid,
-and each item's stream could refuse it. Whether an item was paid was then
-decided in two streams, and the stream that decided the payment was not the
-authority over it.
+**Why:** two places that decide one fact can disagree. For example, a
+transfer component keeps a copy of each account's balance, and refuses a
+transfer that its copy cannot cover. The account has just taken a deposit
+that the copy has not seen yet. The transfer component decides that the
+balance does not cover the transfer, while the account would decide that it
+does, and the customer is refused for money that the account holds.
 
 **In the model:** every event that records a decision is written by a
 handler of the component that owns the decision's data. A decision that
@@ -240,12 +240,11 @@ write ("A component is the authority over its own data"). The other component
 decides it from the event or from a command, and the scenarios walk the
 messages that can arrive in between.
 
-**Why:** a design compared two ways to settle several items in one payment.
-In one, the payment and the settlement of its items were one write. In the
-other, the payment was recorded first, and then each item's stream held the
-item, settled it, or released it. Each item then had a held state. A void
-that arrived while an item was held could not be decided: the item was
-neither paid nor free. Every handler of the items had to consider that state.
+**Why:** for example, a handler writes the void of a document that was paid.
+A handler that subscribes to the void then writes the recovery that the void
+makes owed. A payment that arrives between the two writes finds the document
+voided and nothing owed back, so it pays too much. Every handler that pays
+must then check for a void whose recovery is not written yet.
 
 **In the model:** a handler that writes a decision `writes` each fact of this
 component that follows from it, in the same write. A handler of the
