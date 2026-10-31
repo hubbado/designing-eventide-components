@@ -11,6 +11,7 @@ model, and when you walk the scenarios.
   - A component never reads another component's store
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
+  - A decision that several entities must agree on is one write on one stream
   - Reason about the entity, not about stream positions
   - An entity takes a recorded value from its event
   - A component holds its state in streams, not in an SQL database
@@ -180,6 +181,47 @@ writes the stream that it decides from cannot be separated from it.
 **In the model:** `reads` lists the state of that one entity or row that the
 decision uses: `reads: [pending_addition_id]`. A handler that decides nothing
 has no `reads`.
+
+### A decision that several entities must agree on is one write on one stream
+
+Some decisions are correct only when several entities agree at the same time.
+For example, a payment that settles several items is correct only when no
+other payment has settled any of them. Make such a decision on one stream, in
+one write. Choose the stream's key so that the stream holds the state of each
+entity that the decision reads, such as the account that the items are owed
+on. The handler checks each entity, and writes the result with
+`expected_version`. So no other command comes between the check and the
+result. Two decisions about one entity cannot both pass: the second write
+conflicts, and its retry sees the first.
+
+A process across streams, with one stream for each entity, needs a reason
+that outweighs what it costs. It holds each entity, records the decision, and
+releases the holds when a step is refused. Each entity gets a held state, and
+each release is a compensating event ("Compensating events are a warning").
+When no key can put the entities in one stream, such as a transfer between
+any two accounts of a bank, that is the reason, and the design accepts the
+costs.
+
+One stream can make its entity hold more, such as each open item of an
+account. "An entity's collections stay small for the life of its stream"
+still applies: the entity drops each item when no decision reads it again,
+such as when it is settled. When many items can be open at the same time, the
+one stream is still large. That is a trade-off for the reviewer. Give both
+costs: the size of the one stream, and the holds, the releases and the
+decisions that cross in the process.
+
+**Why:** a design compared two ways to settle several items in one payment.
+In one, the payment was one write on the stream that held the items. In the
+other, a process held each item in its own stream, recorded the payment, and
+released the holds on a refusal. The process cost several times the
+messages, and added states to each item. Two payments that crossed, each
+holding some of the same items, could both be refused. A variant that found
+a second payment only after the fact could record an item paid twice.
+
+**In the model:** for each requirement that needs several entities to agree,
+such as an item settled at most once, name the stream whose one write keeps
+it. When a candidate keeps it across streams, its cell in the table names the
+reason that outweighs the holds and the releases.
 
 ### Reason about the entity, not about stream positions
 
@@ -388,7 +430,8 @@ collection too. Two ways do most of the work:
   a key that nothing frees. A state that other decisions change, such as
   whether a part is paid, stays in the stream that makes those decisions:
   moved out, each decision on several parts would become a protocol between
-  streams.
+  streams ("A decision that several entities must agree on is one write on
+  one stream").
 - **A read of the stream that the handler writes.** A rare command that
   needs an old fact, such as undoing a payment made months ago, reads it from
   the stream that its handler writes, up to the version that its write
@@ -1069,10 +1112,6 @@ From the purchase order example and the designs before it:
 - **Pass a rejection through.** The requester's rejection copies the reasons
   of the reply. The screen must show a sensible message for a reason that it
   does not know.
-- **One stream before a workflow.** When an invariant fits in one stream, keep
-  it there. One design rejected a stream for each payment with two-phase
-  holds, and compensating events, because its invariant fitted in one stream
-  and a person's action in an outside system sat inside the window.
 - **Select by query, not by reaction.** Things that a person chooses from are
   shown from a read model built from this component's events, with their
   states computed at query time. Nothing gets stuck when messages arrive out
