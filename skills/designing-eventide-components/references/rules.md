@@ -242,9 +242,9 @@ messages that can arrive in between.
 
 **Why:** for example, a handler writes the void of a document that was paid.
 A handler that subscribes to the void then writes the recovery that the void
-makes owed. A payment that arrives between the two writes finds the document
-voided and nothing owed back, so it pays too much. Every handler that pays
-must then check for a void whose recovery is not written yet.
+makes owed. A payment that arrives between the two writes finds no recovery
+to take off, so it pays too much. Every handler that pays must then check for
+a void whose recovery is not written yet.
 
 **In the model:** a handler that writes a decision `writes` each fact of this
 component that follows from it, in the same write. A handler of the
