@@ -134,7 +134,9 @@ it again, and copies it".
   otherwise in the first column to the right where it can. It can when its
   lane has no box in that column, and its box would not sit on a straight
   arrow that already passes through that column. If it is on another lane in
-  its cause's column, no box can stand between the two in that column.
+  its cause's column, no box can stand between the two in that column, and its
+  lane must be below its cause's: a step on a lane above its cause goes to the
+  right, because an arrow leaves its cause at the bottom or the right.
 - When one handler writes or sends several steps, list first the step that
   continues the flow onto other lanes. That step gets the straight arrow, and
   the others move to the right.
@@ -195,9 +197,16 @@ positions:
   between two lanes. When a note sits above the first lane, put that lane's
   centre about 300 pixels down. A box grows by about 17 pixels for each
   attribute, and by 20 more for each list.
-- A `reads` arrow that would cross a box on its way, such as an answer that
-  goes back to a lane above and to the right, passes under the lowest lane:
-  give it `fromSide: "bottom"` and `toSide: "bottom"`. Put the notes for the
+- An arrow leaves the message that causes the step at its bottom or its right
+  side, and enters the step at its top or its left side, in the order of the
+  flow, also when a dashed arrow points back at the event. The template picks
+  such sides. When an arrow crosses a box, choose other sides from the same
+  pairs, or a `bend`. A box that enters at the top and leaves from the top is
+  hard to read.
+- A `reads` arrow for which no such route clears every box, such as an
+  answer that goes back to a lane above and to the right, passes under the
+  lowest lane: give it `fromSide: "bottom"` and `toSide: "bottom"`. It is the
+  one exception to the sides above. Put the notes for the
   lowest lane about 240 pixels below its centre, so that they sit below those
   arrows.
 - Such an arrow goes up into the bottom of the message that it reads. Put
