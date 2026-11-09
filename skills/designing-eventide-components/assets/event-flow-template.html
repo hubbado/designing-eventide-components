@@ -43,8 +43,8 @@ window.DIAGRAM = {
       ],
       links: [
         { from: "add-to-po", to: "initiated" },
-        { from: "add-assignment", to: "initiated", kind: "reads" },
-        { from: "sent", to: "initiated", kind: "reads" },
+        { from: "initiated", to: "add-assignment" },
+        { from: "initiated", to: "sent" },
         { from: "add-assignment", to: "assignment-added" },
         { from: "added-to-po", to: "assignment-added", kind: "reads", fromSide: "bottom", toSide: "bottom" },
         { from: "remove-from-po", to: "remove-assignment" },
@@ -97,8 +97,8 @@ window.DIAGRAM = {
       links: [
         { from: "add-to-po", to: "initiated" },
         { from: "add-to-po", to: "refused", label: "no currency or no client", toAt: 0.3 },
-        { from: "add-assignment", to: "initiated", kind: "reads" },
-        { from: "sent", to: "initiated", kind: "reads" },
+        { from: "initiated", to: "add-assignment" },
+        { from: "initiated", to: "sent" },
         { from: "add-assignment", to: "assignment-added" },
         { from: "add-assignment", to: "assignment-rejected", label: "currency or client differs" },
         { from: "added-to-po", to: "assignment-added", kind: "reads", fromSide: "bottom", toSide: "bottom", fromAt: 0.7 },
@@ -192,8 +192,8 @@ window.DIAGRAM = {
       ],
       links: [
         { from: "add-to-po", to: "initiated" },
-        { from: "add-assignment", to: "initiated", kind: "reads" },
-        { from: "sent", to: "initiated", kind: "reads" },
+        { from: "initiated", to: "add-assignment" },
+        { from: "initiated", to: "sent" },
         { from: "remove-from-po", to: "remove-assignment" },
         { from: "remove-from-po", to: "removed-from-po" },
         { from: "add-assignment", to: "assignment-added" },
@@ -291,8 +291,8 @@ window.DIAGRAM = {
     <ul class="legend">
       <li>A lane is a stream. Pale lanes hold commands, solid lanes hold events, and each component has its own colour. Grey dashed lanes are outside the event store.</li>
       <li>Time runs from left to right.</li>
-      <li>A solid arrow means the handler of this command writes or sends that message.</li>
-      <li>A dashed arrow means a handler subscribes to an event, and writes or sends the message at the other end. It points at the event.</li>
+      <li>A solid arrow means the handler of this message, in its own component, writes or sends that message.</li>
+      <li>A dashed arrow means a component subscribes to another component's event, and its handler writes or sends the message at the other end. It points at the event.</li>
       <li>A red title is a rejection. Grey attributes are optional.</li>
       <li>A name above a grey box is a list. Each entry in the list has the attributes in the box.</li>
       <li>Blue boxes are numbered notes.</li>
