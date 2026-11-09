@@ -470,6 +470,15 @@ copy names the fact, with its source in front ("A component holds its state in
 streams"): a void copied from a credit note's stream is `CreditNoteVoided`,
 not `CreditNoteVoidReceived`.
 
+One kind of stream may use mechanical words: a stream that exists only so
+that one holder at a time has something, such as a stream that lets one
+payment at a time hold a pay period. There, `Claimed`, `ClaimRefused` and
+`Released` are the business, and each means the same thing at every step. A
+stream that holds a thing's life, such as a worker's share of an invoice that a
+payment takes and then pays, uses the business's words for what happens to
+it: `AddedToPayment`, not `ItemHeld`. There, "claimed" would mean asked for at
+one step and held at the next, and only the step would tell a reader which.
+
 **In the model:** read each command and event name aloud, as the operator
 would say it. If it needs explaining, look for the word that the business
 uses. If no plain word fits, keep the name, and say why in a comment. If no
