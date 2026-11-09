@@ -14,10 +14,10 @@ window.DIAGRAM = {
     {
       name: "Overview: An assignment is added to a purchase order, and later removed",
       lanes: [
-        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 300 },
-        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 560 },
-        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1000 },
-        { id: "po", label: "purchaseOrder-{id}", component: "purchaseOrder", kind: "entity", y: 1280 }
+        { id: "assignment-command", label: "assignment:command-A1", component: "assignment", kind: "command", y: 300 },
+        { id: "assignment", label: "assignment-A1", component: "assignment", kind: "entity", y: 560 },
+        { id: "po-command", label: "purchaseOrder:command-PO1", component: "purchaseOrder", kind: "command", y: 1000 },
+        { id: "po", label: "purchaseOrder-PO1", component: "purchaseOrder", kind: "entity", y: 1280 }
       ],
       messages: [
         { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
@@ -130,9 +130,9 @@ window.DIAGRAM = {
     {
       name: "An assignment is removed before its request is sent",
       lanes: [
-        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 380 },
-        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 640 },
-        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1060 }
+        { id: "assignment-command", label: "assignment:command-A1", component: "assignment", kind: "command", y: 380 },
+        { id: "assignment", label: "assignment-A1", component: "assignment", kind: "entity", y: 640 },
+        { id: "po-command", label: "purchaseOrder:command-PO1", component: "purchaseOrder", kind: "command", y: 1060 }
       ],
       messages: [
         { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
@@ -165,10 +165,10 @@ window.DIAGRAM = {
     {
       name: "An assignment is removed after its request is sent",
       lanes: [
-        { id: "assignment-command", label: "assignment:command-{id}", component: "assignment", kind: "command", y: 380 },
-        { id: "assignment", label: "assignment-{id}", component: "assignment", kind: "entity", y: 640 },
-        { id: "po-command", label: "purchaseOrder:command-{id}", component: "purchaseOrder", kind: "command", y: 1060 },
-        { id: "po", label: "purchaseOrder-{id}", component: "purchaseOrder", kind: "entity", y: 1360 }
+        { id: "assignment-command", label: "assignment:command-A1", component: "assignment", kind: "command", y: 380 },
+        { id: "assignment", label: "assignment-A1", component: "assignment", kind: "entity", y: 640 },
+        { id: "po-command", label: "purchaseOrder:command-PO1", component: "purchaseOrder", kind: "command", y: 1060 },
+        { id: "po", label: "purchaseOrder-PO1", component: "purchaseOrder", kind: "entity", y: 1360 }
       ],
       messages: [
         { id: "add-to-po", lane: "assignment-command", column: 0, title: "Add To Purchase Order",
@@ -289,7 +289,7 @@ window.DIAGRAM = {
   <section class="column" aria-labelledby="h-legend">
     <h2 id="h-legend">How to read the panels</h2>
     <ul class="legend">
-      <li>A lane is a stream. Pale lanes hold commands, solid lanes hold events, and each component has its own colour. Grey dashed lanes are outside the event store.</li>
+      <li>A lane is a stream; on a Design panel, a lane stands for every stream of its category. Pale lanes hold commands, solid lanes hold events, and each component has its own colour. Grey dashed lanes are outside the event store.</li>
       <li>Time runs from left to right.</li>
       <li>A solid arrow means the handler of this message, in its own component, writes or sends that message.</li>
       <li>A dashed arrow means a component subscribes to another component's event, and its handler writes or sends the message at the other end. It points at the event.</li>

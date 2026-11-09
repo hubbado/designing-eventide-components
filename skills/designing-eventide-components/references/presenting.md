@@ -95,12 +95,19 @@ panels follow in the order of the scenarios document. A panel of one area of
 the design in full, drawn from its handlers rather than from one walk, comes
 after the stories that lead into that area.
 
-**Lanes.** For each stream that the scenario's steps use, in the order of the
-model's `streams`: the stream's command lane, if a step is one of its
-commands, and then its event lane. Then one lane for each outside thing that a
-step uses, for one of its changes. The labels are `<category>:command-<key>`,
-`<category>-<key>`, or the outside thing's name. The lane's `component` is the
-stream's component.
+**Lanes.** One for each stream that the scenario's steps use: two streams of
+one category, such as the shares of two invoices, get two lanes. Order them by
+the model's `streams`, and the streams of one category by their first step.
+A stream's command lane, if a step is one of its commands, comes before its
+event lane. Then one lane for each outside thing that a step uses, for one of
+its changes. The labels are the stream's name in the scenario,
+`<category>:command-<id>` and `<category>-<id>`, such as `purchaseOrder-PO1`,
+or the outside thing's name. The lane's `component` is the stream's
+component. A Design panel shows handlers, not one walk, so its lanes are one
+for each category, labelled `<category>:command-<key>` and `<category>-<key>`.
+
+**Why:** a lane is one stream. Two streams on one lane read as one stream, such
+as a stream for one share that seems to record two shares.
 
 **Boxes.** One for each step that the panel shows. A scenario's table starts
 from empty streams, but a panel is a display: leave out the setup steps that
