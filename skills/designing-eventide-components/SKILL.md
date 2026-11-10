@@ -349,10 +349,13 @@ Read the model and the scenarios against this list, item by item:
   stream has a comment that gives its reason.
 - The handlers that write one version-gated row handle messages of one
   category.
-- After the walks, no afferent component handles the events of a component
-  that depends on it, or has a message, attribute or state that only one of
-  the processes that use it needs. Each component, afferent or efferent, is
-  in `questions`.
+- After the walks, no afferent entity handles the events of an entity that
+  depends on it, or has a message, attribute or state that only one of the
+  processes that use it needs. Each entity, afferent or efferent, is in
+  `questions`.
+- Between two entities, coupling goes one way. The efferent entity sends the
+  afferent one commands and handles its events. The afferent entity does
+  neither.
 - Every handler is safe when its message arrives twice.
 - The cases of stage 3 (twice, at the same time, in a different order, late)
   have a scenario, or a note says why they cannot happen.

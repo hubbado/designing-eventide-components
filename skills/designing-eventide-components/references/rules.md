@@ -173,6 +173,14 @@ component: it sends commands to afferent components and handles their events.
 Put a process, and the state and guards that it needs, in an efferent
 component, where change is cheap.
 
+An afferent component is general, and an efferent one is special: it serves
+one process. Special logic in an afferent component is the mistake to look
+for, because every component that depends on it must change with it.
+
+Between two components, coupling goes one way. The efferent component sends
+the afferent one commands and handles its events. The afferent component does
+neither.
+
 Which components are afferent is a fact of the business: how many processes
 change a thing, now and later. One design's requirements often name only one
 of them.
@@ -185,8 +193,12 @@ so that a deposit from another sender could not end a transfer. Every other
 process that moves money in or out of an account would add the same to the
 account.
 
+**Source:** Scott Bellware, [SAGE: Early Warning System for Design
+Mistakes](https://madabout.software/articles/sage-early-warning-system-for-design-mistakes/)
+(2019), a restatement of Robert Martin's distance from the main sequence.
+
 **In the model:** after the walks, read the couplings again, and put each
-component, afferent or efferent, to the reviewer in `questions`, with the
+entity, afferent or efferent, to the reviewer in `questions`, with the
 couplings that support it.
 
 ### A handler decides from the one thing that it writes
