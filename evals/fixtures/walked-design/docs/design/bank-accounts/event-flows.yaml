@@ -46,6 +46,10 @@ streams:
       Initiated: [transfer_id, source_account_id, destination_account_id, amount, time, user_id?]
       WithdrawalSent: [transfer_id, source_account_id, destination_account_id, amount, withdrawal_id]
       Cancelled: [transfer_id, source_account_id, destination_account_id, amount, reason, data]
+      # Copies of the account's events, with the transfer's id in front.
+      AccountWithdrawn: [transfer_id, account_id, withdrawal_id, amount, balance, time, user_id?]
+      AccountDepositRejected: [transfer_id, account_id, deposit_id, amount, reason, data, user_id?]
+      AccountDeposited: [transfer_id, account_id, deposit_id, amount, balance, time, user_id?]
       DepositSent: [transfer_id, source_account_id, destination_account_id, amount, deposit_id]
       Completed: [transfer_id, source_account_id, destination_account_id, amount]
       ReturnSent: [transfer_id, source_account_id, destination_account_id, amount, return_id, reason, data]
@@ -114,9 +118,23 @@ handlers:
     handles: account.WithdrawalRejected
     writes: [Cancelled]
 
-  # deposit_id is the transfer_id.
+  # The transfer's consumer of the account's events copies each one into the
+  # transfer's stream, and its own consumer acts on the copy.
   - component: transfer_component
     handles: account.Withdrawn
+    writes: [AccountWithdrawn]
+
+  - component: transfer_component
+    handles: account.DepositRejected
+    writes: [AccountDepositRejected]
+
+  - component: transfer_component
+    handles: account.Deposited
+    writes: [AccountDeposited]
+
+  # deposit_id is the transfer_id.
+  - component: transfer_component
+    handles: AccountWithdrawn
     sends: [Deposit]
     writes: [DepositSent]
 
@@ -124,7 +142,7 @@ handlers:
   # transfer_id. The source refuses the return only when it was closed after
   # the withdrawal [money-in-no-account].
   - component: transfer_component
-    handles: account.DepositRejected
+    handles: AccountDepositRejected
     reads: [deposit_id, return_id]
     one_of:
       - when: the deposit into the destination
@@ -134,7 +152,7 @@ handlers:
         writes: [ReturnRefused]
 
   - component: transfer_component
-    handles: account.Deposited
+    handles: AccountDeposited
     reads: [deposit_id, return_id]
     one_of:
       - when: the deposit into the destination
