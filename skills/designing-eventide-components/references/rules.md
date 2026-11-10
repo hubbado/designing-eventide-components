@@ -613,11 +613,10 @@ copy names the fact, with its source in front ("A component holds its state in
 streams"): a void copied from a credit note's stream is `CreditNoteVoided`,
 not `CreditNoteVoidReceived`. When what the consumer writes is the stream's own
 fact, and nothing waits on it for a later decision, it takes the stream's own
-name: an order line's `Recorded`, from an order that is divided into lines.
-When it holds the other stream's fact for a decision that comes later, it
-takes the source's name in front: a payment's `PayPeriodClaimed`, its copy of
-a pay period's `Claimed`, or an order line's `OrderLineCancelled`, the
-order's cancellation of a line, which can arrive before the line.
+name: in the purchase order example, the assignment records the purchase
+order's `AssignmentAdded` as its own `AddedToPurchaseOrder`. When it holds the
+other stream's fact for a decision that comes later, it takes the source's
+name in front, as `CreditNoteVoided` does.
 
 One kind of stream may use mechanical words: a stream that exists only so
 that one holder at a time has something, such as a stream that lets one
