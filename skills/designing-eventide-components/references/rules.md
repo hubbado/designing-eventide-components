@@ -11,6 +11,7 @@ model, and when you walk the scenarios.
   - A component never reads another component's store
   - A component is the authority over its own data
   - Design each entity as a component of its own
+  - One entity is on one stream
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - A decision and what follows from it are one write
@@ -182,6 +183,34 @@ handler writes, not in what it reads.
 that entity's own messages. A stream that other entities change has commands.
 A handler that writes on another entity's stream has a comment that gives its
 reason, and the change log records the decision.
+
+### One entity is on one stream
+
+Keep all of one entity's facts, and every decision about them, on one stream.
+Do not split an entity between two streams, such as one stream that records
+the thing's facts and the order in which they arrived, and another that
+decides what they mean.
+
+Two streams can each hold part of what looks like one thing, when two
+processes use it and each process can take every one of its decisions from
+its own stream alone. Even then, a reader must find both streams to learn the
+whole state of the thing, so avoid it.
+
+**Why:** a design kept a worker's account, which decided whether each of the
+worker's shares of an invoice was open, paid, or owed back after a void. A
+second stream for each share recorded the share once and its void once, and
+gave them to the account with the share first. To learn what a void did, a
+reader had to hold both streams, and the order in which one fed the other.
+Neither stream was the authority over the share: one decided that the share
+was recorded and voided, and the other decided what that meant for the
+worker's money.
+
+**In the model:** the `why` of each stream names the one entity that it
+holds, and every decision about that entity is written on that stream.
+Another stream can hold a copy of its events, which decides nothing ("A
+component is the authority over its own data"). A stream that holds part of
+the same thing as another has a comment that names the two processes, and
+says how each one decides from its own stream alone.
 
 ### Afferent components take commands, and efferent components coordinate them
 
