@@ -344,6 +344,9 @@ Read the model and the scenarios against this list, item by item:
 - Every handler decides from the one entity or row that it writes, and its
   `reads` names only state of that entity or row. A scenario shows where any
   data from another component arrived.
+- Every handler of another entity's event writes a record of it, or a
+  decision, on its own entity's stream, and sends nothing. Commands are sent
+  only from an entity's own events.
 - Every handler writes the stream of one entity. Another entity changes that
   stream only with a command, and a handler that writes on another entity's
   stream has a comment that gives its reason.

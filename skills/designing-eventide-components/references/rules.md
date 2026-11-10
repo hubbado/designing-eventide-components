@@ -10,6 +10,7 @@ model, and when you walk the scenarios.
 - Streams, stores and state
   - A component never reads another component's store
   - Design each entity as a component of its own
+  - An entity records another entity's event before it acts on it
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - Reason about the entity, not about stream positions
@@ -150,6 +151,27 @@ handler writes, not in what it reads.
 that entity's own messages. A stream that other entities change has commands.
 A handler that writes on another entity's stream has a comment that gives its
 reason, and the change log records the decision.
+
+### An entity records another entity's event before it acts on it
+
+An entity learns of another entity's event by recording it, in its own
+words, as an event on its own stream. Its handler of the other entity's event
+writes only that record, or a decision that it makes from its own entity in
+the same write. The entity sends commands only from its own events.
+
+**Why:** a payment sent its holds to its items from a handler of the pay
+period's `Claimed`. The payment's stream then showed the holds with no claim
+before them, so a reader of it could not tell why they started. The send hung
+from another entity's event, and the payment kept a sequence for that
+entity's category to stop a second send. Eventide's funds transfer example
+does it the other way: it copies the account's `Withdrawn` into its own
+stream as its own `Withdrawn`, and sends `Deposit` from that. Then the one
+handler that copies is the only one that knows the other entity's message,
+and the entity's process reacts only to its own events.
+
+**In the model:** a handler whose `handles` is another entity's event has
+`writes` on its own stream and no `sends`. The handler of the record that it
+writes sends the commands.
 
 ### Afferent components take commands, and efferent components coordinate them
 
