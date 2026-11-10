@@ -18,19 +18,15 @@ reads as a second rule.
 A new rule, or a change to what a rule asks, merges on one of two kinds of
 evidence:
 
-- **A recorded failure.** A design's change note, or a walk of its scenarios,
-  shows the skill going wrong without the rule, and the reviewer decided the
-  rule. A session that did not write the rule has then walked the design with
-  it. Link the failure and that walk in the pull request, and open a grader
-  issue that links them too.
+- **A problem that it fixed.** The pull request describes, in general nouns,
+  the problem that a design met without the rule, and how the rule fixed it.
+  Open a grader issue with the same description.
 - **A grader.** A rule with no recorded failure, written before anything went
   wrong, merges only with its grader.
 
 **Why:** a rule that a design needed, and that waited for its grader, stayed
 unmerged for ten days. A later session did not find it, and made the mistake
-that it prevents. A rule written in the moment can also be wrong in the
-moment: one rule went through five versions in an afternoon, so a walk by a
-session that did not write it comes before the merge.
+that it prevents.
 
 A grader fails on the skill without the change and passes with it. Add it to
 a case in `evals/`, or write a new case. A case that resumes a history
