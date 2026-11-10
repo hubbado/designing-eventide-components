@@ -38,6 +38,26 @@ In this order:
   MUST do. Inside each section, group the requirements by subject. Each one is
   a bold id and one or two sentences: "**settled-once.** An item MUST be
   settled at most once."
+- **Technical constraints.** The rules that the design keeps for technical
+  reasons, apart from the requirements, which are in the words of the
+  business.
+  - Examples: "no entity collection grows for the life of its stream", and
+    "every payment is one write on one stream". A constraint can name a
+    stream or an entity.
+  - List a constraint when it shapes this design, such as when it rejects a
+    candidate. Do not copy every rule of [rules.md](rules.md).
+  - Each constraint is a bold id and one or two sentences, and says what it
+    protects, such as a consumer's memory.
+  - A constraint that changes what a requirement promises, or adds a business
+    rule, is a decision for the reviewer. Record it in the change log as a
+    trade-off that names the constraint and the requirement. Do not change
+    the requirement to fit the constraint until the reviewer agrees.
+  - An exception to a constraint that the reviewer accepts is written under
+    the constraint, with its reason.
+  - In one design, a constraint that kept an entity's collections small
+    became a business rule: one kind of item stopped being payable. Each edge
+    case that followed got one more rule. A week went by before anyone saw
+    that the cause was a technical constraint, written as a requirement.
 - **Out of scope.** What the process does not do, in one line each, and who
   or what does it instead.
 - **Other processes.** For each thing whose state the design changes, the
@@ -84,6 +104,10 @@ nothing that they must decide. Judge it by these tests:
 - **Each sentence earns its place.** Ask of each one: would the reviewer miss
   it? If not, cut it or move it.
 - **Plain words and short sentences**, as for the requirements.
+- **A long bullet is split.** A bullet that runs past four lines, or about 50
+  words, is hard to read. Keep its claim at the top, and give each supporting
+  fact as a sub-bullet, with one claim each. A reviewer can then read the
+  claims first, and read the facts only where they need them.
 - **Measure it.** Count the words in each section. A large section with
   nothing to decide is the first to move or to shorten. One design document
   had 7,600 words, of which 27% were resolved problems and 18% a calculation
