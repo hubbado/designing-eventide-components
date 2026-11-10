@@ -24,8 +24,8 @@ and each column.
 | An attribute that ends in `?` | an entry in message `attrs` that ends in `?` | Grey attribute, in its place |
 | An attribute in braces, a list of entries | an entry `{ name: [parts] }` in message `attrs` | The list's name over a grey box, which holds the attributes of each entry |
 | An event with `reasons` | message `rejected: true` | Red title |
-| A step and the earlier step of its own component whose handler writes or sends it | link, `kind: "writes"` | Solid arrow |
-| A step written or sent by a handler of another component's event: the component subscribes to that event | link, `kind: "reads"` | Dashed arrow. It points at the event |
+| A step and the command whose handler writes or sends it | link, `kind: "writes"` | Solid arrow |
+| A step and the event whose handler writes or sends it: the handler subscribes to the event | link, `kind: "reads"` | Dashed arrow. It points at the event |
 | The `when` of a `one_of` branch | link `label` | Text on the arrow |
 | A note | note | Blue box, with thin arrows to what it explains |
 | A scenario chosen for a panel | panel | An Excalidraw frame with the scenario's name |
@@ -155,13 +155,12 @@ These rules give exactly the columns of every panel in the template.
 
 **Links.** One for each step that another step causes.
 
-- When the step's handler handles an event of another component, the link
-  has `kind: "reads"`, goes `from` the step `to` its cause, and points at the
-  event. The component subscribes to the other component's event.
-- Otherwise the link has `kind: "writes"` (the default) and goes `from` the
-  cause `to` the step: a command, or an event of the step's own component.
-  A component's handling of its own messages is one flow, and a dashed arrow
-  there would read as a second component.
+- When the step's handler handles an event, the link has `kind: "reads"`, goes
+  `from` the step `to` its cause, and points at the event. The handler
+  subscribes to the event, also when the event is in its own stream or its own
+  component: an event is delivered by subscription, whoever wrote it.
+- When the step's handler handles a command, the link has `kind: "writes"`
+  (the default) and goes `from` the cause `to` the step: a command is sent.
 - When the handler has `one_of`, the link's `label` is the branch's `when`.
   When the step's Data names a branch, use that branch's `when`. A branch with
   no `when`, a command's success, has no label.
