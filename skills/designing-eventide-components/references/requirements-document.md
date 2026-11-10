@@ -84,6 +84,10 @@ nothing that they must decide. Judge it by these tests:
 - **Each sentence earns its place.** Ask of each one: would the reviewer miss
   it? If not, cut it or move it.
 - **Plain words and short sentences**, as for the requirements.
+- **A long bullet is split.** A bullet that runs past four lines, or about 50
+  words, is hard to read. Keep its claim at the top, and give each supporting
+  fact as a sub-bullet, with one claim each. A reviewer can then read the
+  claims first, and read the facts only where they need them.
 - **Measure it.** Count the words in each section. A large section with
   nothing to decide is the first to move or to shorten. One design document
   had 7,600 words, of which 27% were resolved problems and 18% a calculation
