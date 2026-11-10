@@ -160,6 +160,12 @@ Read `references/rules.md` and `references/model-format.md`.
   couplings that the row "Other processes" judges. Give each stream a line that
   starts with its name and its component, such as "`purchaseOrder-{id}`, in
   purchase_order_component:", also when the candidate has one component.
+- Name the same fact with the same name in every candidate. Only what a
+  candidate adds gets a name of its own. A reader who compares the candidates
+  must see only how their structures differ, and whether a name is right is
+  one decision for the whole design, not one for each candidate. For example,
+  when two candidates both record that a payment settled an item, both call it
+  `Paid`, even if one records it for each item and the other for the payment.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
