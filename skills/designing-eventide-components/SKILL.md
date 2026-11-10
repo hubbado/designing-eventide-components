@@ -54,6 +54,13 @@ seen in full. A reviewer cannot judge a name: one report gave five new
 requirements by their ids alone, and the reviewer could not tell whether any
 of them was wrong.
 
+Show a problem, and a change of flow before and after, as an ASCII diagram
+first: a lane for each stream, its messages in time order, and arrows for
+what causes what, with the step that goes wrong marked. Then explain it in
+words. A reviewer scans a diagram faster than prose, and sees at once which
+stream holds what, and in which order. Prose alone makes the reviewer build
+the picture in their head, and a wrong picture leads to a wrong decision.
+
 ## Read these first
 
 - The feature's design document, if there is one.
