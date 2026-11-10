@@ -157,7 +157,10 @@ reason, and the change log records the decision.
 An entity learns of another entity's event by recording it, in its own
 words, as an event on its own stream. Its handler of the other entity's event
 writes only that record, or a decision that it makes from its own entity in
-the same write. The entity sends commands only from its own events.
+the same write. The entity sends commands only from its own events. The
+record is named for the other entity and its event: `PayslipClaimed` for a
+payslip's `Claimed`, `ShareAddToPaymentRejected` for a share's
+`AddToPaymentRejected`.
 
 **Why:** a payment sent its holds to its items from a handler of the pay
 period's `Claimed`. The payment's stream then showed the holds with no claim
@@ -168,6 +171,11 @@ does it the other way: it copies the account's `Withdrawn` into its own
 stream as its own `Withdrawn`, and sends `Deposit` from that. Then the one
 handler that copies is the only one that knows the other entity's message,
 and the entity's process reacts only to its own events.
+
+**Why the name:** the payment recorded a share's `AddToPaymentRejected` as
+`ShareRefused`, two words for one fact, and a share's `AddedToPayment` as
+`ShareAdded`, which does not say what the share was added to. A name made of
+the entity and its event says which fact a record copies, and from where.
 
 **In the model:** a handler whose `handles` is another entity's event has
 `writes` on its own stream and no `sends`. The handler of the record that it
