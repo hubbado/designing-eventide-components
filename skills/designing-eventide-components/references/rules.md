@@ -899,12 +899,23 @@ A shipment for an unknown order looks wrong. But if the shipment is recorded,
 the fact is kept whether the order arrives or not, and something can deal
 later with a shipment for an order that never arrived.
 
-When the stream must give a fact after the fact that it follows, record the
-early one as started, and let the handler of the later fact complete it. A
-void that arrives before its document is issued writes `VoidInitiated`, and
-the handler of `Issued` then writes `Voided`. Name the started fact
-`<Fact>Initiated`, so that a reader of the stream sees a process that has
-started and is not complete, and recognises the same case in every component.
+A fact from another component that arrives before the fact that it follows
+has still happened. Record it when it arrives, under the name of the fact,
+and let the entity's state give it its meaning when the earlier fact
+arrives. A void of a share that arrives before the share is recorded as the
+void; when the share arrives, the entity knows that it is voided, so it is
+never outstanding. Do not name a message for a wait, such as `Held` or
+`Pending`, and do not write the fact a second time later, as though it
+happened then.
+
+A command that arrives before the fact that it needs is different: nothing
+has happened yet, it has only been asked. When the entity accepts it, record
+the request as started, and let the handler of the later fact complete it.
+A `Void` for a document whose issue is not yet complete writes
+`VoidInitiated`, and the handler of `Issued` then writes `Voided`. Name the
+started fact `<Fact>Initiated`, so that a reader of the stream sees a
+process that has started and is not complete, and recognises the same case
+in every component.
 
 A command handler also tries to accept commands in any order. It balances
 that against two costs: the entity's own state must stay correct, and the
@@ -916,11 +927,18 @@ entity keeps, such as a booking checked against the seats left when it
 arrives. A command sent again is the usual case, and its own id makes it
 cheap: see "Every handler is idempotent".
 
+**Why:** a design gave each share of an invoice a stream that held a void
+which came before its share, and gave the void to the worker's account
+after the share, in a second write. Between the two writes the share was
+open, and a payment could take it. The void then owed the money back from
+the worker, for a share that was voided before it was ever paid.
+
 **In the model:** a handler of another component's event, or of a command
 from another system, records what arrives, whatever has or has not arrived
-before it. Walk the orders that two consumers or two components can produce:
-a credit note recorded before its invoice, for example, which the screen
-marks until the invoice arrives. A command handler that refuses a command
+before it. A handler of another component's event writes the fact when it
+arrives, and no event's name says that the fact waits. Walk the orders that
+two consumers or two components can produce: a credit note recorded before
+its invoice, for example, which the screen marks until the invoice arrives. A command handler that refuses a command
 because of what has or has not arrived before it says why, in the model:
 what accepting it would cost.
 
