@@ -1,4 +1,0 @@
-schema_version: "1.1"
-name: customer-payments-settles-in-one-write
-context:
-  scaffold_script: scaffold.sh
