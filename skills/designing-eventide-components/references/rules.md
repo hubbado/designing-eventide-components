@@ -128,6 +128,11 @@ only that entity's rules.
 A handler that writes on the stream of another entity in the same deployed
 component needs a written reason. That is very rare.
 
+An entity may know an entity on which it depends. Whether it learns from that
+entity's events or is told by commands follows the direction of coupling,
+and the direction follows the next rule, "Afferent components take commands,
+and efferent components coordinate them", applied to each entity.
+
 **Why:** a design had one component for a worker's payments, with a stream for
 each payment and a stream for each pay period, which lets one payment at a
 time hold the pay period. The pay period had no commands. A handler of the
