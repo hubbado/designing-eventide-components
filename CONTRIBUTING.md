@@ -21,8 +21,8 @@ evidence:
 - **A problem that it fixed.** The pull request describes, in general nouns,
   the problem that a design met without the rule, and how the rule fixed it.
   Open a grader issue with the same description.
-- **A grader.** A rule that no design's problem taught, written before anything went
-  wrong, merges only with its grader.
+- **A grader.** A rule that no design's problem taught, written before
+  anything went wrong, merges only with its grader.
 
 **Why:** a rule that a design needed, and that waited for its grader, stayed
 unmerged for ten days. A later session did not find it, and made the mistake
