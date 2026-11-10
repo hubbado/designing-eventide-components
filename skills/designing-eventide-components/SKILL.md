@@ -79,8 +79,10 @@ design's files together in one folder, such as `docs/design/<topic>/`:
 - `scenarios.md`: the walks that test the one against the other.
 - `event-flows.html`: the panels, drawn from the model.
 - `changes/`: the change log.
-- `dismissed/`: the model of each dismissed candidate that the reviewer asks
-  to keep, one file for each, in the model format.
+- `dismissed/`: each dismissed candidate that the reviewer asks to keep. Its
+  model, in the model format, is `dismissed/<name>.yaml`. A candidate that
+  also keeps its scenarios or other files is a folder,
+  `dismissed/<name>/`, with its model as `event-flows.yaml` beside them.
 
 Every correction changes the requirements, the model or the scenarios first.
 If the panels and the model disagree, the model is right; fix the panels. A
