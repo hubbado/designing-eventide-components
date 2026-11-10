@@ -24,8 +24,8 @@ and each column.
 | An attribute that ends in `?` | an entry in message `attrs` that ends in `?` | Grey attribute, in its place |
 | An attribute in braces, a list of entries | an entry `{ name: [parts] }` in message `attrs` | The list's name over a grey box, which holds the attributes of each entry |
 | An event with `reasons` | message `rejected: true` | Red title |
-| A step and the command whose handler writes or sends it | link, `kind: "writes"` | Solid arrow |
-| A step and the event whose handler writes or sends it: the handler subscribes to the event | link, `kind: "reads"` | Dashed arrow. It points at the event |
+| A command that a handler sends, or an event that the handler of a command writes | link, `kind: "writes"` | Solid arrow, from the cause to the step |
+| An event that the handler of an event writes: the handler subscribes to the event | link, `kind: "subscribes"` | Dashed arrow, from the cause to the step |
 | The `when` of a `one_of` branch | link `label` | Text on the arrow |
 | A note | note | Blue box, with thin arrows to what it explains |
 | A scenario chosen for a panel | panel | An Excalidraw frame with the scenario's name |
@@ -95,12 +95,19 @@ panels follow in the order of the scenarios document. A panel of one area of
 the design in full, drawn from its handlers rather than from one walk, comes
 after the stories that lead into that area.
 
-**Lanes.** For each stream that the scenario's steps use, in the order of the
-model's `streams`: the stream's command lane, if a step is one of its
-commands, and then its event lane. Then one lane for each outside thing that a
-step uses, for one of its changes. The labels are `<category>:command-<key>`,
-`<category>-<key>`, or the outside thing's name. The lane's `component` is the
-stream's component.
+**Lanes.** One for each stream that the scenario's steps use: two streams of
+one category, such as the shares of two invoices, get two lanes. Order them by
+the model's `streams`, and the streams of one category by their first step.
+A stream's command lane, if a step is one of its commands, comes before its
+event lane. Then one lane for each outside thing that a step uses, for one of
+its changes. The labels are the stream's name in the scenario,
+`<category>:command-<id>` and `<category>-<id>`, such as `purchaseOrder-PO1`,
+or the outside thing's name. The lane's `component` is the stream's
+component. A Design panel shows handlers, not one walk, so its lanes are one
+for each category, labelled `<category>:command-<key>` and `<category>-<key>`.
+
+**Why:** a lane is one stream. Two streams on one lane read as one stream, such
+as a stream for one share that seems to record two shares.
 
 **Boxes.** One for each step that the panel shows. A scenario's table starts
 from empty streams, but a panel is a display: leave out the setup steps that
@@ -134,7 +141,9 @@ it again, and copies it".
   otherwise in the first column to the right where it can. It can when its
   lane has no box in that column, and its box would not sit on a straight
   arrow that already passes through that column. If it is on another lane in
-  its cause's column, no box can stand between the two in that column.
+  its cause's column, no box can stand between the two in that column, and its
+  lane must be below its cause's: a step on a lane above its cause goes to the
+  right, because an arrow leaves its cause at the bottom or the right.
 - When one handler writes or sends several steps, list first the step that
   continues the flow onto other lanes. That step gets the straight arrow, and
   the others move to the right.
@@ -146,11 +155,16 @@ These rules give exactly the columns of every panel in the template.
 
 **Links.** One for each step that another step causes.
 
-- When the step's handler handles an event, the link has `kind: "reads"`, goes
-  `from` the step `to` its cause, and points at the event. The handler
-  subscribes to the event, also when the event is in its own stream.
-- When the step's handler handles a command, the link has `kind: "writes"`
-  (the default) and goes `from` the cause `to` the step.
+- Every link goes `from` the cause `to` the step, in the order of the flow.
+- When the step is an event and its handler handles an event, the link has
+  `kind: "subscribes"`. The handler subscribes to the event, also when the
+  event is in its own stream or its own component: an event is delivered by
+  subscription, whoever wrote it.
+- When the step is a command, the link has `kind: "writes"` (the default),
+  also when the handler that sends it handles an event: sending a command
+  writes it to the command stream. The step's Caused by still names the event.
+- When the step is an event and its handler handles a command, the link has
+  `kind: "writes"`.
 - When the handler has `one_of`, the link's `label` is the branch's `when`.
   When the step's Data names a branch, use that branch's `when`. A branch with
   no `when`, a command's success, has no label.
@@ -193,12 +207,19 @@ positions:
   between two lanes. When a note sits above the first lane, put that lane's
   centre about 300 pixels down. A box grows by about 17 pixels for each
   attribute, and by 20 more for each list.
-- A `reads` arrow that would cross a box on its way, such as an answer that
-  goes back to a lane above and to the right, passes under the lowest lane:
-  give it `fromSide: "bottom"` and `toSide: "bottom"`. Put the notes for the
+- An arrow leaves the message that causes the step at its bottom or its right
+  side, and enters the step at its top or its left side, in the order of the
+  flow. The template picks
+  such sides. When an arrow crosses a box, choose other sides from the same
+  pairs, or a `bend`. A box that enters at the top and leaves from the top is
+  hard to read.
+- An arrow for which no such route clears every box, such as an
+  answer that goes back to a lane above and to the right, passes under the
+  lowest lane: give it `fromSide: "bottom"` and `toSide: "bottom"`. It is the
+  one exception to the sides above. Put the notes for the
   lowest lane about 240 pixels below its centre, so that they sit below those
   arrows.
-- Such an arrow goes up into the bottom of the message that it reads. Put
+- Such an arrow goes up into the bottom of the step. Put
   the note on a message that is handled again above its lane, where that
   arrow does not cross it.
 - Put each note in the gap next to the step it explains. Keep notes off
@@ -230,7 +251,7 @@ from 0. Titles wrap by themselves; attributes show one on each line.
 
 **Link**: `{ from, to, kind, label, fromSide, fromAt, toSide, toAt, bend }`.
 Only `from` and `to` are necessary. A link runs straight when the two messages
-line up, and bends once when they do not. A `reads` link with `fromSide` and
+line up, and bends once when they do not. A link with `fromSide` and
 `toSide` both `"bottom"` runs below the lowest lane of the panel; each one runs
 a little lower than the one before, so they do not overlap. `fromAt` and
 `toAt` (0 to 1, default 0.5) move an end along its side. `bend` sets the height of the horizontal run in pixels.

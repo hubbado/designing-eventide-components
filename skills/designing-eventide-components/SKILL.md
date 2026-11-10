@@ -54,6 +54,13 @@ seen in full. A reviewer cannot judge a name: one report gave five new
 requirements by their ids alone, and the reviewer could not tell whether any
 of them was wrong.
 
+Show a problem, and a change of flow before and after, as an ASCII diagram
+first: a lane for each stream, its messages in time order, and arrows for
+what causes what, with the step that goes wrong marked. Then explain it in
+words. A reviewer scans a diagram faster than prose, and sees at once which
+stream holds what, and in which order. Prose alone makes the reviewer build
+the picture in their head, and a wrong picture leads to a wrong decision.
+
 ## Read these first
 
 - The feature's design document, if there is one.
@@ -160,6 +167,12 @@ Read `references/rules.md` and `references/model-format.md`.
   couplings that the row "Other processes" judges. Give each stream a line that
   starts with its name and its component, such as "`purchaseOrder-{id}`, in
   purchase_order_component:", also when the candidate has one component.
+- Name the same fact with the same name in every candidate. Only what a
+  candidate adds gets a name of its own. A reader who compares the candidates
+  must see only how their structures differ, and whether a name is right is
+  one decision for the whole design, not one for each candidate. For example,
+  when two candidates both record that a payment settled an item, both call it
+  `Paid`, even if one records it for each item and the other for the payment.
 - Decide the components in the sketches, and not before: the reviewer's
   answers to stage 1 must say what the process is first. Group the streams by
   the rule "Afferent components take commands, and efferent components
@@ -338,12 +351,23 @@ Read the model and the scenarios against this list, item by item:
 - Every handler decides from the one entity or row that it writes, and its
   `reads` names only state of that entity or row. A scenario shows where any
   data from another component arrived.
+- Every handler of another component's or another entity's event writes one
+  event, the same each time: a copy of it, or of its part about the stream,
+  and sends nothing. One that calculates or decides has a comment that says
+  why. Each decision and each command sent is in a handler of the stream's
+  own events.
+- Every handler writes the stream of one entity. Another entity changes that
+  stream only with a command, and a handler that writes on another entity's
+  stream has a comment that gives its reason.
 - The handlers that write one version-gated row handle messages of one
   category.
-- After the walks, no afferent component handles the events of a component
-  that depends on it, or has a message, attribute or state that only one of
-  the processes that use it needs. Each component, afferent or efferent, is
-  in `questions`.
+- After the walks, no afferent entity handles the events of an entity that
+  depends on it, or has a message, attribute or state that only one of the
+  processes that use it needs. Each entity, afferent or efferent, is in
+  `questions`.
+- Between two entities, coupling goes one way. The efferent entity sends the
+  afferent one commands and handles its events. The afferent entity does
+  neither.
 - Every handler is safe when its message arrives twice.
 - The cases of stage 3 (twice, at the same time, in a different order, late)
   have a scenario, or a note says why they cannot happen.

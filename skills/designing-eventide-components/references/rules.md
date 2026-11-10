@@ -10,6 +10,7 @@ model, and when you walk the scenarios.
 - Streams, stores and state
   - A component never reads another component's store
   - A component is the authority over its own data
+  - Design each entity as a component of its own
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - A decision and what follows from it are one write
@@ -146,6 +147,42 @@ another component needs reaches it as a command that it sends, with the
 answer that it handles, or as an event that it copies. No handler refuses a
 copy of another component's decision.
 
+### Design each entity as a component of its own
+
+Design each entity, that is its stream and its command stream, as a component
+of its own, also when it is deployed in one component with other entities.
+"A component is the authority over its own data" then holds for each entity:
+another entity changes it only with a command to its command stream, and
+learns of its changes only from its events. Its own handlers alone write its
+stream. A handler belongs to the entity whose stream it writes, and it knows
+only that entity's rules.
+
+A handler that writes on the stream of another entity in the same deployed
+component needs a written reason. That is very rare.
+
+An entity may know an entity on which it depends. Whether it learns from that
+entity's events or is told by commands follows the direction of coupling,
+and the direction follows the next rule, "Afferent components take commands,
+and efferent components coordinate them", applied to each entity.
+
+**Why:** a design had one component for a worker's payments, with a stream for
+each payment and a stream for each pay period, which lets one payment at a
+time hold the pay period. The pay period had no commands. A handler of the
+payment's events wrote the pay period's claim directly on the pay period's
+stream, so the pay period's one rule, one payment at a time, lived in the
+payment's handler. Handlers of the payment's other events wrote its release on
+the pay period's stream, and the payment's changes on the streams of the
+items that it paid. Each entity held the knowledge of another, and none could
+change or move to a component of its own without the others. "A handler
+decides from the one thing that it writes" did not find this, because each
+handler read only the stream that it wrote. The fault is in whose stream a
+handler writes, not in what it reads.
+
+**In the model:** each handler's `writes` names the stream of one entity, and
+that entity's own messages. A stream that other entities change has commands.
+A handler that writes on another entity's stream has a comment that gives its
+reason, and the change log records the decision.
+
 ### Afferent components take commands, and efferent components coordinate them
 
 A component's afferent couplings are the components that depend on it. Its
@@ -168,6 +205,14 @@ component: it sends commands to afferent components and handles their events.
 Put a process, and the state and guards that it needs, in an efferent
 component, where change is cheap.
 
+An afferent component is general, and an efferent one is special: it serves
+one process. Special logic in an afferent component is the mistake to look
+for, because every component that depends on it must change with it.
+
+Between two components, coupling goes one way. The efferent component sends
+the afferent one commands and handles its events. The afferent component does
+neither.
+
 Which components are afferent is a fact of the business: how many processes
 change a thing, now and later. One design's requirements often name only one
 of them.
@@ -180,8 +225,12 @@ so that a deposit from another sender could not end a transfer. Every other
 process that moves money in or out of an account would add the same to the
 account.
 
+**Source:** Scott Bellware, [SAGE: Early Warning System for Design
+Mistakes](https://madabout.software/articles/sage-early-warning-system-for-design-mistakes/)
+(2019), a restatement of Robert Martin's distance from the main sequence.
+
 **In the model:** after the walks, read the couplings again, and put each
-component, afferent or efferent, to the reviewer in `questions`, with the
+entity, afferent or efferent, to the reviewer in `questions`, with the
 couplings that support it.
 
 ### A handler decides from the one thing that it writes
@@ -319,13 +368,29 @@ There are two uses for a database, and both are queries:
 The design then had no stream that recorded the arrival of the upstream fact,
 and nothing in the component could react to it.
 
-**In the model:** a consumer of another component's event writes that event
-to a stream of this component, under the event's name with its stream's name
-in front: `invoice.Issued` becomes `InvoiceIssued`. It is a plain copy: the
-attributes of the stream's key first, then every attribute of the upstream
-event. The consumer chooses only the streams. It does not choose parts of the
-event or calculate, so that its one job stays simple; anything that follows is
-a handler of the copy. The consumer that writes the copy is then one of
+**Why, also:** a payment sent its holds to its items from a handler of the pay
+period's `Claimed`, and decided that it was paid in the handler of its last
+item's answer. Its stream then showed holds with no claim before them, and
+`Paid` in the same write as an answer, so no event showed what caused either;
+the logic was only in code. Eventide's funds transfer example copies the
+account's `Withdrawn` into its own stream as its own `Withdrawn`, and sends
+`Deposit` from that. With a copy first, every decision follows an event of
+the stream's own that caused it, and only the copying consumer knows the
+other stream's message.
+
+**In the model:** a consumer of another component's event, or of another
+entity's event ("Design each entity as a component of its own"), writes one
+event to a stream of this component, the same each time it is handled. It is
+a copy of that event, or of the part of it that is about the stream that it
+writes, such as one worker's entry in a list of shares: the attributes of the
+stream's key first, then those of the upstream event or of its part. A copy
+of a whole event takes the event's name with its stream's name in front:
+`invoice.Issued` becomes `InvoiceIssued`. The consumer almost never
+calculates or decides, so that its one job stays simple; where it does, a
+comment in the model says why. The usual case is a decision that needs the
+stream's state from before the copy is applied ("A decision and what follows
+from it are one write"). Otherwise a decision, or a command sent, is a handler
+of the stream's own events. The consumer that writes the copy is then one of
 several that write the stream, beside the stream's own consumers of its
 commands and events. Now and then two of them write with the same expected
 version, and one write fails. Its consumer retries the message ("Every
@@ -546,7 +611,21 @@ process, such as goods that a warehouse receives, and then `GoodsReceived` is
 the right name. When a stream takes in a fact that another stream owns, its
 copy names the fact, with its source in front ("A component holds its state in
 streams"): a void copied from a credit note's stream is `CreditNoteVoided`,
-not `CreditNoteVoidReceived`.
+not `CreditNoteVoidReceived`. When what the consumer writes is the stream's own
+fact, and nothing waits on it for a later decision, it takes the stream's own
+name: in the purchase order example, the assignment records the purchase
+order's `AssignmentAdded` as its own `AddedToPurchaseOrder`. When it holds the
+other stream's fact for a decision that comes later, it takes the source's
+name in front, as `CreditNoteVoided` does.
+
+One kind of stream may use mechanical words: a stream that exists only so
+that one holder at a time has something, such as a stream that lets one
+payment at a time hold a pay period. There, `Claimed`, `ClaimRefused` and
+`Released` are the business, and each means the same thing at every step. A
+stream that holds a thing's life, such as a worker's share of an invoice that a
+payment takes and then pays, uses the business's words for what happens to
+it: `AddedToPayment`, not `ItemHeld`. There, "claimed" would mean asked for at
+one step and held at the next, and only the step would tell a reader which.
 
 **In the model:** read each command and event name aloud, as the operator
 would say it. If it needs explaining, look for the word that the business
