@@ -472,10 +472,15 @@ nobody has set up yet, is a problem for the reviewer to accept or refuse, with
 its escape hatch ("Problems found").
 
 **Why:** an entity that grows shows no fault in the tests or at go-live. Its
-cost shows years later, as a consumer whose memory grows until it is stopped,
-and in an event-sourced system such a defect is very hard to fix after the
-fact. Snapshots make a fetch shorter, but the entity in memory is the same
-size. An earlier version of this rule allowed a collection whose entries came
+cost shows years later, and a restart does not remove it. Each time a message
+about the entity arrives, the consumer holds the whole entity in memory, and
+after a restart the first such message projects the whole stream again.
+Eventide's entity cache is different: it grows with the number of entities
+that a consumer has fetched since it started, but a restart empties it. The
+consumer then loads only the entities that get new messages, and a stream
+that holds one thing gets none after its work is done. In an event-sourced
+system, an entity that grows is very hard to fix after the fact. Snapshots
+make a fetch shorter, but the entity in memory is the same size. An earlier version of this rule allowed a collection whose entries came
 with a rare business act. A design built that way soon had several, because
 the information has to be projected and stored however rare the event.
 
