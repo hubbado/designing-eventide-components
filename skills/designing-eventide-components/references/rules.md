@@ -300,13 +300,16 @@ the stream's own that caused it, and only the copying consumer knows the
 other stream's message.
 
 **In the model:** a consumer of another component's event, or of another
-entity's event ("Design each entity as a component of its own"), writes that
-event to a stream of this component, under the event's name with its stream's name
-in front: `invoice.Issued` becomes `InvoiceIssued`. It is a plain copy: the
-attributes of the stream's key first, then every attribute of the upstream
-event. The consumer chooses only the streams. It does not choose parts of the
-event or calculate, so that its one job stays simple; anything that follows,
-a decision or a command sent, is a handler of the copy. The consumer that writes the copy is then one of
+entity's event ("Design each entity as a component of its own"), writes one
+event to a stream of this component, the same each time it is handled. It is
+a copy of that event, or of the part of it that is about the stream that it
+writes, such as one worker's entry in a list of shares: the attributes of the
+stream's key first, then those of the upstream event or of its part. A copy
+of a whole event takes the event's name with its stream's name in front:
+`invoice.Issued` becomes `InvoiceIssued`. The consumer almost never
+calculates or decides, so that its one job stays simple; where it does, a
+comment in the model says why. A decision, or a command sent, is a handler of
+the stream's own events. The consumer that writes the copy is then one of
 several that write the stream, beside the stream's own consumers of its
 commands and events. Now and then two of them write with the same expected
 version, and one write fails. Its consumer retries the message ("Every
@@ -527,7 +530,12 @@ process, such as goods that a warehouse receives, and then `GoodsReceived` is
 the right name. When a stream takes in a fact that another stream owns, its
 copy names the fact, with its source in front ("A component holds its state in
 streams"): a void copied from a credit note's stream is `CreditNoteVoided`,
-not `CreditNoteVoidReceived`.
+not `CreditNoteVoidReceived`. When what the consumer writes is the stream's own
+fact, and nothing waits on it for a later decision, it takes the stream's own
+name: a share's `Recorded`, from the day book's division of an invoice. When it
+holds the other stream's fact for a decision that comes later, it takes the
+source's name in front: `PayslipClaimed`, or `DayBookInvoiceShareVoided` for a
+void that can arrive before its share.
 
 One kind of stream may use mechanical words: a stream that exists only so
 that one holder at a time has something, such as a stream that lets one
