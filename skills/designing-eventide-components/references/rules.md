@@ -9,6 +9,7 @@ model, and when you walk the scenarios.
 - The parts of a design
 - Streams, stores and state
   - A component never reads another component's store
+  - Design each entity as a component of its own
   - Afferent components take commands, and efferent components coordinate them
   - A handler decides from the one thing that it writes
   - Reason about the entity, not about stream positions
@@ -114,6 +115,36 @@ they must remember to set, is not a safeguard. (Checked in evt-entity_store
 decision needs data that another component owns, a scenario must show where
 that data arrived: an earlier step in which a handler of this component
 received the other component's event, or a command that carries the data.
+
+### Design each entity as a component of its own
+
+Design each entity, that is its stream and its command stream, as a component
+of its own, also when it is deployed in one component with other entities.
+Another entity changes it only with a command to its command stream, and
+learns of its changes only from its events. Its own handlers alone write its
+stream. A handler belongs to the entity whose stream it writes, and it knows
+only that entity's rules.
+
+A handler that writes on the stream of another entity in the same deployed
+component needs a written reason. That is very rare.
+
+**Why:** a design had one component for a worker's payments, with a stream for
+each payment and a stream for each pay period, which lets one payment at a
+time hold the pay period. The pay period had no commands. A handler of the
+payment's events wrote the pay period's claim directly on the pay period's
+stream, so the pay period's one rule, one payment at a time, lived in the
+payment's handler. Handlers of the payment's other events wrote its release on
+the pay period's stream, and the payment's changes on the streams of the
+items that it paid. Each entity held the knowledge of another, and none could
+change or move to a component of its own without the others. "A handler
+decides from the one thing that it writes" did not find this, because each
+handler read only the stream that it wrote. The fault is in whose stream a
+handler writes, not in what it reads.
+
+**In the model:** each handler's `writes` names the stream of one entity, and
+that entity's own messages. A stream that other entities change has commands.
+A handler that writes on another entity's stream has a comment that gives its
+reason, and the change log records the decision.
 
 ### Afferent components take commands, and efferent components coordinate them
 

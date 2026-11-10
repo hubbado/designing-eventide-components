@@ -344,6 +344,9 @@ Read the model and the scenarios against this list, item by item:
 - Every handler decides from the one entity or row that it writes, and its
   `reads` names only state of that entity or row. A scenario shows where any
   data from another component arrived.
+- Every handler writes the stream of one entity. Another entity changes that
+  stream only with a command, and a handler that writes on another entity's
+  stream has a comment that gives its reason.
 - The handlers that write one version-gated row handle messages of one
   category.
 - After the walks, no afferent component handles the events of a component
