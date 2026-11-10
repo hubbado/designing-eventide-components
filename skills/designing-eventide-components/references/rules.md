@@ -240,6 +240,14 @@ write ("A component is the authority over its own data"). The other component
 decides it from the event or from a command, and the scenarios walk the
 messages that can arrive in between.
 
+The same holds when the decision is made on a copy of another component's
+event ("A component holds its state in streams"). When the decision needs the
+stream's state from before the copy is applied, such as whether a share was
+still open when its void arrived, the copy and the decision are one write. A
+separate handler of the copy fetches the stream with the copy applied, and
+cannot see that state. The model's comment on the consumer says why it
+decides.
+
 **Why:** for example, a handler writes the void of a document that was paid.
 A handler that subscribes to the void then writes the recovery that the void
 makes owed. A payment that arrives between the two writes finds no recovery
