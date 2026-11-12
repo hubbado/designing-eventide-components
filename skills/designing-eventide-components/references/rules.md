@@ -39,6 +39,7 @@ model, and when you walk the scenarios.
   - Accept messages in any order of arrival
   - Write from what the stream knows
   - Guard only where it is strictly necessary
+  - A handler that copies from another stream does not also filter
   - Keep the component's facts true, and leave policy to people
   - A command's own attributes are checked by its validation
   - Stop the line on incoming data that is wrong
@@ -481,7 +482,8 @@ entity"), so its idempotence must be explicit. These are the mechanisms.
   Do not repair such a step with a list of exceptions to the sequence. The
   list must say in advance which messages may come back, and a message that
   it does not name stays lost. Change the step so that it passes no message
-  that it can want later.
+  that it can want later ("A handler that copies from another stream does not
+  also filter").
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
   to a stream keyed by the original ids plus the key. A second copy finds
@@ -1117,6 +1119,40 @@ needs it, move the check to the application, or let the command through and
 correct forward. Before you propose a refusal, check it against the other
 rules here: a blank attribute is the command's validation, and a message can
 arrive in any order.
+
+
+### A handler that copies from another stream does not also filter
+
+To copy messages from another stream and to filter them in the same step is
+unusual, and it is the one place where a design can lose a message. The
+handler passes a message that the filter does not want, and writes nothing.
+The filter then changes, and the sequence is past the message, so nothing
+brings it in.
+
+Copy every message, and filter in the stream that holds the filter. The copy
+is then the trace of the message, and the handler of a change of the filter
+reads its own stream to find what it now wants.
+
+Where a copy must filter all the same, the design says how a message that
+was passed is found, and which ordinary action brings it in. A loss that
+nothing shows and nothing can repair is not acceptable, however unlikely it
+is.
+
+This rule is about the design. A message that is lost because a handler's
+code is wrong is a fault of the build.
+
+**Why:** a stream copied another component's documents, but only those
+inside a time window that an operator could widen. A document that was
+issued in the instant while the window was changed was passed, and it fell
+below the sequence. The reviewer did not object to the race. He objected
+that the document was then missing with no sign, and that no replay and no
+command could bring it in: the loss "would be undetectable and, in the
+current design, unfixable". The design now copies every document, and the
+window decides inside the stream.
+
+**In the model:** a handler of another component's event has no `ignores`
+that rests on a value that can change. A filter that can change is in a
+handler of the stream's own events.
 
 ### Keep the component's facts true, and leave policy to people
 
