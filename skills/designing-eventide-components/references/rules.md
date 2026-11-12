@@ -461,7 +461,9 @@ entity"), so its idempotence must be explicit. These are the mechanisms.
 - **A sequence check**, the usual default. The entity records, for each
   source, the global position of the last message that it applied. The
   handler first checks the message's global position against it, and logs
-  and ignores a message that it has already processed. This works only while
+  and ignores a message that it has already processed. It stops
+  one message from being processed again. It does nothing for the same thing
+  delivered as a second message. This works only while
   the global positions of the messages that cause the events in a stream
   never go down: an event that follows an older message lowers the recorded
   global position, and messages already handled are then handled again.
@@ -483,7 +485,8 @@ entity"), so its idempotence must be explicit. These are the mechanisms.
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
   to a stream keyed by the original ids plus the key. A second copy finds
-  that stream and is ignored. The handler's block runs each time it handles
+  that stream and is ignored. It stops the same thing, delivered as
+  two messages, from being processed two times. The handler's block runs each time it handles
   the copy, as on a consumer replay, so the block still starts with the
   sequence check. A command takes the reservation when it can be sent again
   out of order and sets a state that another command can reverse, such as a
