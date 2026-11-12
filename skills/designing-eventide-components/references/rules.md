@@ -23,7 +23,6 @@ model, and when you walk the scenarios.
   - A consumer's stored position is not a fact to design on
   - Give each read of a stream or a category its stop
   - Build on Eventide's patterns, not on the store's mechanics
-  - A consumer takes its whole category, and its handler decides
   - Keep each component's streams tidy
   - An entity's collections stay small for the life of its stream
 - Messages
@@ -568,24 +567,6 @@ reviewer refused it: those mechanics "are not ours to play with".
 **In the model:** each `idempotence` is one of the mechanisms in "Every
 handler is idempotent, and the model says how". A tool reads with the
 libraries' readers, not with SQL.
-
-### A consumer takes its whole category, and its handler decides
-
-Do not give a consumer an SQL condition to select its messages. The handler
-gets each message of the category, and ignores in code the ones that are not
-for it.
-
-**Why:** a condition filters where nothing sees it. One design looked at a
-consumer for each customer, each with a condition on the customer's id. A
-build showed three ways in which it drops messages with no error and no log
-line: a message that lacks the field, a key written in another case, and a
-condition that changes while the consumer keeps its position. In code, the
-first stops the consumer, and the others leave a line that says what was
-ignored. A condition also does nothing for the hard part of such a design,
-which is to handle earlier messages again.
-
-**In the model:** a handler's `ignores` says what it does not take. No
-consumer has a condition.
 
 ### Keep each component's streams tidy
 
