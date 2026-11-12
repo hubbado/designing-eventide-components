@@ -45,6 +45,7 @@ model, and when you walk the scenarios.
   - Record every "simpler if" decision
 - Keeping the documents true
   - When a term changes, change it in every current document
+  - Say which position: a stream's or the store's
   - A pattern in a model is not a rule
 - Patterns you will meet
 
@@ -431,10 +432,11 @@ note that says why.
 ### A version-gated row takes updates from one category only
 
 A read-model row whose version is the global position of the message that
-last wrote it ignores a message whose position is not newer. Messages of one
-category reach their consumer in the order of their positions, but messages
-of two categories do not. So when two consumers update the same row, an
-update that arrives late carries a lower position than one already applied,
+last wrote it ignores a message whose global position is not newer. Messages
+of one category reach their consumer in the order of their global positions,
+but messages of two categories do not. So when two consumers update the same
+row, an update that arrives late carries a lower global position than one
+already applied,
 and it is lost without an error.
 
 **Why:** a draft model had a second consumer write a flag onto a row that the
@@ -453,17 +455,18 @@ idempotence must be explicit. These are the mechanisms.
 
 - **A sequence check**, the usual default. The entity records, for each
   source, the global position of the last message that it applied. The
-  handler first checks the message's position against it, and logs and
-  ignores a message that it has already processed. This works only while the
-  positions of the messages that cause the events in a stream never go down:
-  an event that follows an older message lowers the recorded position, and
-  messages already handled are then handled again. It is also not safe for a
-  consumer that may be replayed from an earlier position to pick up what it
-  skipped, when the position is kept for each source category: the skipped
-  message is now below the recorded position, and it is ignored as
-  processed. Such a consumer keeps, beside the category's sequence, a
-  position for each source stream that the replay must bring in. A position
-  for every source stream would be a collection that grows ("An entity's
+  handler first checks the message's global position against it, and logs
+  and ignores a message that it has already processed. This works only while
+  the global positions of the messages that cause the events in a stream
+  never go down: an event that follows an older message lowers the recorded
+  global position, and messages already handled are then handled again. It
+  is also not safe for a consumer that may be replayed from an earlier
+  global position to pick up what it skipped, when the global position is
+  kept for each source category: the skipped message is now below the
+  recorded one, and it is ignored as processed. Such a consumer keeps,
+  beside the category's sequence, a global position for each source stream
+  that the replay must bring in. One for every source stream would be a
+  collection that grows ("An entity's
   collections stay small").
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
@@ -530,8 +533,8 @@ first find out which one acted.
 **In the model:** a handler that `sends` a command also `writes` its `…Sent`
 event, or the event of its outcome when the receiver cannot refuse the
 command. Its `idempotence` says how it finds that record. Usually that is the
-sequence check: the record follows the cause, so the cause's position is
-recorded.
+sequence check: the record follows the cause, so the cause's global position
+is recorded.
 
 ### An entity's collections stay small for the life of its stream
 
@@ -1239,6 +1242,30 @@ noun.
 changes a term, search the design's folder and the project's guides for the
 old term in each of its forms, such as the verb, the past tense and the noun.
 Change each use outside the history.
+
+### Say which position: a stream's or the store's
+
+A message has two positions. Its position, "P" for short, is its place in
+its own stream, and it starts at 0. Its global position, "GP" for short, is
+its place in the whole message store. Each sentence, step and diagram that
+gives a position says which of the two it is. A design can show either one,
+or both: the rule is only that a reader always knows which.
+
+A category has no position of its own. A consumer reads a category in the
+order of global position, and the sequence that a sequence check records is
+a global position.
+
+**Why:** the two put messages in different orders, and a rule of the design
+can rest on either. A walk said that a replay of a category "had reached
+500" when a change made an "earlier" document wanted, "at 300". Both numbers
+were global positions. The document's own date was later than the others',
+and that date was the reason that nothing had copied it yet. The reviewer
+took "earlier" to be the document's date, and could not see how the case
+arose.
+
+**In the model and the scenarios:** a comment or an `idempotence` line says
+"position" for a place in a stream and "global position" for a place in the
+store. A step's Data, and a diagram, give a number as `P 2` or `GP 300`.
 
 ### A pattern in a model is not a rule
 
