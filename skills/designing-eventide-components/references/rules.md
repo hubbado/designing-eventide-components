@@ -452,9 +452,11 @@ own.
 
 ### Every handler is idempotent, and the model says how
 
-Messages are delivered at least once. A handler cannot tell from its stream
-position that it did the work before ("Reason about the entity"), so its
-idempotence must be explicit. These are the mechanisms.
+A message is delivered when it is written to its stream. One message can be
+handled more than once: its consumer reads it again after a restart. The same
+thing can also be delivered more than once, as two messages. A handler cannot
+tell from its stream position that it did the work before ("Reason about the
+entity"), so its idempotence must be explicit. These are the mechanisms.
 
 - **A sequence check**, the usual default. The entity records, for each
   source, the global position of the last message that it applied. The
@@ -462,15 +464,22 @@ idempotence must be explicit. These are the mechanisms.
   and ignores a message that it has already processed. This works only while
   the global positions of the messages that cause the events in a stream
   never go down: an event that follows an older message lowers the recorded
-  global position, and messages already handled are then handled again. It
-  is also not safe for a consumer that may be replayed from an earlier
-  global position to pick up what it skipped, when the global position is
-  kept for each source category: the skipped message is now below the
-  recorded one, and it is ignored as processed. Such a consumer keeps,
-  beside the category's sequence, a global position for each source stream
-  that the replay must bring in. One for every source stream would be a
-  collection that grows ("An entity's
-  collections stay small").
+  global position, and messages already handled are then handled again.
+
+  It also cannot bring back a message that the handler passed. The entity
+  records the global position of the last message that it applied, and takes
+  each message at or below it as done. So a message that was ignored below
+  that mark is ignored again each time that it is handled again.
+
+  The sequence check therefore fits only a step where each message is
+  decided for good the first time. A handler that ignores a message by a
+  filter that can change later, such as a time window that an operator can
+  widen, is not such a step.
+
+  Do not repair such a step with a list of exceptions to the sequence. The
+  list must say in advance which messages may come back, and a message that
+  it does not name stays lost. Change the step so that it passes no message
+  that it can want later.
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
   to a stream keyed by the original ids plus the key. A second copy finds
