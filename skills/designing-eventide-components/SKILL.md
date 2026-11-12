@@ -57,7 +57,10 @@ of them was wrong.
 Show a problem, and a change of flow before and after, as an ASCII diagram
 first: a lane for each stream, its messages in time order, and arrows for
 what causes what, with the step that goes wrong marked. Then explain it in
-words. A reviewer scans a diagram faster than prose, and sees at once which
+words. Do this whenever you explain a problem or its solution to the
+reviewer in the conversation, also between the stops, and for each finding
+of a review. Label each position in a diagram as P or GP (the rule "Say
+which position: a stream's or the store's"). A reviewer scans a diagram faster than prose, and sees at once which
 stream holds what, and in which order. Prose alone makes the reviewer build
 the picture in their head, and a wrong picture leads to a wrong decision.
 
