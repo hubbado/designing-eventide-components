@@ -257,8 +257,7 @@ Read `references/rules.md` and `references/model-format.md`.
 Read `references/scenarios-format.md`.
 
 Invent scenarios that could break a requirement, and walk each one through
-the model. Start with the simplest case, and make them harder: a message
-delivered twice; two requests at the same time; a second request before the
+the model. Start with the simplest case, and make them harder: a message handled twice; the same thing delivered as two messages; two requests at the same time; a second request before the
 first completes; messages that arrive in a different order; a reply to a
 request that was replaced; a fact that arrives after the decision that it
 would have changed. Include cases that "should never happen", such as another
