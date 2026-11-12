@@ -20,6 +20,7 @@ model, and when you walk the scenarios.
   - A component holds its state in streams, not in an SQL database
   - A version-gated row takes updates from one category only
   - Every handler is idempotent, and the model says how
+  - A consumer's stored position is not a fact to design on
   - Keep each component's streams tidy
   - An entity's collections stay small for the life of its stream
 - Messages
@@ -500,6 +501,31 @@ again.
 
 **In the model:** a handler that does not use the sequence check says which
 mechanism it uses, in `idempotence`.
+
+### A consumer's stored position is not a fact to design on
+
+A consumer writes its position to the store only after each run of messages,
+a hundred by default, and not when it stops. So the stored position is behind
+what the consumer has handled, and it stays behind while the category is
+quiet. Do not design a step that needs the stored position to be current, and
+do not set the interval to one message to make it current. The stored
+position only saves work after a restart. Idempotence is the work of the
+handlers.
+
+**Why:** a write for each message that a consumer reads takes away most of
+its speed, for every message of the category, wanted or not. A consumer whose
+position is always current also hides a handler that is not idempotent, until
+the day that a message does arrive a second time. One design had a tool that
+must know when a consumer had read its category again from the start. It
+waited until the consumer's stored position had passed the end of the
+category. In a quiet category the stored position stayed a few messages
+below the end, so the wait never finished, and the repair that was proposed
+was an interval of one message.
+
+**In the model:** no handler, tool or scenario decides from a consumer's
+stored position. A step that must know that a message was handled reads what
+its handler wrote. A tool that must know that it has read a category to its
+end reads the category itself.
 
 ### Keep each component's streams tidy
 
