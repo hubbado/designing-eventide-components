@@ -21,6 +21,9 @@ model, and when you walk the scenarios.
   - A version-gated row takes updates from one category only
   - Every handler is idempotent, and the model says how
   - A consumer's stored position is not a fact to design on
+  - Give each read of a stream or a category its stop
+  - Build on Eventide's patterns, not on the store's mechanics
+  - A consumer takes its whole category, and its handler decides
   - Keep each component's streams tidy
   - An entity's collections stay small for the life of its stream
 - Messages
@@ -526,6 +529,63 @@ was an interval of one message.
 stored position. A step that must know that a message was handled reads what
 its handler wrote. A tool that must know that it has read a category to its
 end reads the category itself.
+
+### Give each read of a stream or a category its stop
+
+A handler or a tool that reads a stream or a category gives the read the
+place at which it stops: a position in a stream, or a global position in a
+category. Do not read "to the end" of a thing that still takes messages. Its
+end moves while the read runs, and nothing says that the read reaches it.
+
+**Why:** a tool was to read a whole category of another component, hand each
+wanted message to a handler, and then report that it had finished. Its first
+form read the category until no message was left. That category takes
+messages all day. It is unlikely that the tool never reaches the end, but
+nothing in the design makes it certain, and the report depends on it. With a
+stop at a global position that is fixed before the read starts, the read is
+finite, and the design can say who handles each message above the stop.
+
+**In the model:** each read of history in a `reads` names its stop: the
+version that the handler's write expects, or the position of the event that
+it handles. A tool's read of a category names the event whose global position
+is its stop, and says who handles the messages above it.
+
+### Build on Eventide's patterns, not on the store's mechanics
+
+A design uses the message store through what Eventide documents: streams and
+categories, expected versions, the sequence check, the reservation. It does
+not rest on how the store is built inside: its indexes, its tables, its SQL,
+or a value that the store or the writer gives a message, such as its id.
+
+**Why:** the store belongs to another project, and no document promises its
+inside. One design made a copy idempotent by a message id that the handler
+calculated from the copied message, so that the store's unique index on ids
+refused a second copy. A build showed that it worked. It also showed a raw
+database error in place of a library's error, an entry in the database's log
+for each refusal, and a rule that no document of the store describes. The
+reviewer refused it: those mechanics "are not ours to play with".
+
+**In the model:** each `idempotence` is one of the mechanisms in "Every
+handler is idempotent, and the model says how". A tool reads with the
+libraries' readers, not with SQL.
+
+### A consumer takes its whole category, and its handler decides
+
+Do not give a consumer an SQL condition to select its messages. The handler
+gets each message of the category, and ignores in code the ones that are not
+for it.
+
+**Why:** a condition filters where nothing sees it. One design looked at a
+consumer for each customer, each with a condition on the customer's id. A
+build showed three ways in which it drops messages with no error and no log
+line: a message that lacks the field, a key written in another case, and a
+condition that changes while the consumer keeps its position. In code, the
+first stops the consumer, and the others leave a line that says what was
+ignored. A condition also does nothing for the hard part of such a design,
+which is to handle earlier messages again.
+
+**In the model:** a handler's `ignores` says what it does not take. No
+consumer has a condition.
 
 ### Keep each component's streams tidy
 
