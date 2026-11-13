@@ -16,6 +16,7 @@ model, and when you walk the scenarios.
   - A handler decides from the one thing that it writes
   - A decision and what follows from it are one write
   - Reason about the entity, not about stream positions
+  - A value that is fixed before the commit does not say when a message became visible
   - An entity takes a recorded value from its event
   - A component holds its state in streams, not in an SQL database
   - A version-gated row takes updates from one category only
@@ -358,6 +359,47 @@ written. When it started again, it handled each arrival against the entity
 projected to the head of the stream, found all three documents each time, and
 wrote "complete" three times. The design had assumed that only the handler of
 the third arrival would see three.
+
+
+### A value that is fixed before the commit does not say when a message became visible
+
+A handler reads the clock, and the store gives a message its global position,
+before the write commits. In that short time other messages can become
+visible. So neither value says what a consumer had handled when the message
+became visible.
+
+- **The clock time.** Between the handler's read of the clock and the commit,
+  a message with a later time can be written and handled. The clocks of two
+  hosts also differ.
+- **The global position.** The store gives it at the insert. Inside one
+  category the store's write lock keeps the order of global positions the
+  same as the order of commits. Across two categories it does not: a message
+  with a higher global position can become visible before one with a lower
+  global position.
+
+Do not decide from either value which messages of another category a consumer
+handled before an event. Inside one stream the position decides, because each
+write to a stream checks its expected version.
+
+**Why:** this is one of the hazards of a copy that also filters ("A handler
+that copies from another stream does not also filter"). A consumer that takes
+each message of its category in order and decides it for good never needs to
+know which messages it handled before an event of another category. A design
+that filters does, each time that its filter changes.
+
+One such design had to know which documents of another category its consumer
+had handled before a setting was changed. It first took those with a time
+before the time that the handler read from its clock. A document with a time
+one second later was handled before the change was written, and it was lost.
+It then took those with a global position below that of the change event. A
+build held one write open, and a message with a higher global position was
+visible 300 ms before one with a lower global position. In normal use the
+time between an insert and its commit was under a millisecond, so the fault
+is rare, and it gives no sign.
+
+**In the model:** a rule that puts a message of one category before or after
+an event of another category has a comment that says why it is safe. A rule
+inside one stream uses positions.
 
 ### An entity takes a recorded value from its event
 
