@@ -16,10 +16,14 @@ model, and when you walk the scenarios.
   - A handler decides from the one thing that it writes
   - A decision and what follows from it are one write
   - Reason about the entity, not about stream positions
+  - A value that is fixed before the commit does not say when a message became visible
   - An entity takes a recorded value from its event
   - A component holds its state in streams, not in an SQL database
   - A version-gated row takes updates from one category only
   - Every handler is idempotent, and the model says how
+  - A consumer's stored position is not a fact to design on
+  - Give each read of a stream or a category its stop
+  - Build on Eventide's patterns, not on the store's mechanics
   - Keep each component's streams tidy
   - An entity's collections stay small for the life of its stream
 - Messages
@@ -355,6 +359,48 @@ projected to the head of the stream, found all three documents each time, and
 wrote "complete" three times. The design had assumed that only the handler of
 the third arrival would see three.
 
+
+### A value that is fixed before the commit does not say when a message became visible
+
+A handler reads the clock, and the store gives a message its global position,
+before the write commits. In that short time other messages can become
+visible. So neither value says what a consumer had handled when the message
+became visible.
+
+- **The clock time.** Between the handler's read of the clock and the commit,
+  a message with a later time can be written and handled. The clocks of two
+  hosts also differ.
+- **The global position.** The store gives it at the insert. Inside one
+  category the store's write lock keeps the order of global positions the
+  same as the order of commits. Across two categories it does not: a message
+  with a higher global position can become visible before one with a lower
+  global position.
+
+Do not decide from either value which messages of another category a consumer
+handled before an event. Inside one stream the position decides, because each
+write to a stream checks its expected version.
+
+**Why:** this is one of the hazards of a handler that ignores a message by a
+filter that can change later ("Every handler is idempotent, and the model
+says how"). A consumer that takes each message of its category in order and
+decides it for good never needs to know which messages it handled before an
+event of another category. A design whose filter can change does, each time
+that the filter changes.
+
+One such design had to know which documents of another category its consumer
+had handled before a setting was changed. It first took those with a time
+before the time that the handler read from its clock. A document with a time
+one second later was handled before the change was written, and it was lost.
+It then took those with a global position below that of the change event. A
+build held one write open, and a message with a higher global position was
+visible 300 ms before one with a lower global position. In normal use the
+time between an insert and its commit was under a millisecond, so the fault
+is rare, and it gives no sign.
+
+**In the model:** a rule that puts a message of one category before or after
+an event of another category has a comment that says why it is safe. A rule
+inside one stream uses positions.
+
 ### An entity takes a recorded value from its event
 
 When an event records a value that a handler calculated, such as a total, the
@@ -449,29 +495,55 @@ own.
 
 ### Every handler is idempotent, and the model says how
 
-Messages are delivered at least once. A handler cannot tell from its stream
-position that it did the work before ("Reason about the entity"), so its
-idempotence must be explicit. These are the mechanisms.
+A message is delivered when it is written to its stream. One message can be
+handled more than once: its consumer reads it again after a restart. The same
+thing can also be delivered more than once, as two messages. A handler cannot
+tell from its stream position that it did the work before ("Reason about the
+entity"), so its idempotence must be explicit. These are the mechanisms.
 
 - **A sequence check**, the usual default. The entity records, for each
   source, the global position of the last message that it applied. The
   handler first checks the message's global position against it, and logs
-  and ignores a message that it has already processed. This works only while
+  and ignores a message that it has already processed. It stops
+  one message from being processed again. It does nothing for the same thing
+  delivered as a second message. This works only while
   the global positions of the messages that cause the events in a stream
   never go down: an event that follows an older message lowers the recorded
-  global position, and messages already handled are then handled again. It
-  is also not safe for a consumer that may be replayed from an earlier
-  global position to pick up what it skipped, when the global position is
-  kept for each source category: the skipped message is now below the
-  recorded one, and it is ignored as processed. Such a consumer keeps,
-  beside the category's sequence, a global position for each source stream
-  that the replay must bring in. One for every source stream would be a
-  collection that grows ("An entity's
-  collections stay small").
+  global position, and messages already handled are then handled again.
+
+  It also cannot bring back a message that the handler passed. The entity
+  records the global position of the last message that it applied, and takes
+  each message at or below it as done. So a message that was ignored below
+  that mark is ignored again each time that it is handled again.
+
+  The sequence check therefore fits only a step where each message is
+  decided for good the first time. To ignore a message by a fact that never
+  changes for it, such as its type, its owner or a flag that it carries, is
+  such a decision, and it is the usual way to take the few messages that a
+  handler wants from another stream. To ignore a message by a filter that
+  can change later, such as a time window that an operator can widen, is
+  not: the message that was passed can be wanted later, and the sequence is
+  then past it.
+
+  Do not repair such a step with a list of exceptions to the sequence. The
+  list must say in advance which messages may come back, and a message that
+  it does not name stays lost. Change the step so that it passes no message
+  that it can want later: record the message in the handler's own stream,
+  and let the filter that can change decide there.
+
+  One risk stays, and a design accepts it. A fault, such as wrong code in the
+  handler, can make the handler pass a message that it must apply. If the
+  consumer then goes on, the next message that the entity applies puts the
+  recorded global position above the passed one, and no replay brings it
+  back. When that occurs, it is a major problem. It is also a fact of every
+  idempotence that rests on a sequence, and it is almost always acceptable.
+  Do not design a repair for it, such as a repair command, or a list in
+  another component that finds such a message.
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
   to a stream keyed by the original ids plus the key. A second copy finds
-  that stream and is ignored. The handler's block runs each time it handles
+  that stream and is ignored. It stops the same thing, delivered as
+  two messages, from being processed two times. The handler's block runs each time it handles
   the copy, as on a consumer replay, so the block still starts with the
   sequence check. A command takes the reservation when it can be sent again
   out of order and sets a state that another command can reverse, such as a
@@ -498,8 +570,88 @@ handler moved to a consumer with a new position, that consumer read the
 category from the start and sent the notifications for every old document
 again.
 
+A stream copied another component's documents, but only those inside a time
+window that an operator could widen. A document that was issued in the
+instant while the window was changed was passed, and it fell below the
+sequence. The reviewer did not object to the race. He objected that the
+document was then missing with no sign, and that no replay and no command
+could bring it in: the loss "would be undetectable and, in the current
+design, unfixable". The design now copies every document of the owner that
+it serves, and the window decides inside the stream.
+
 **In the model:** a handler that does not use the sequence check says which
-mechanism it uses, in `idempotence`.
+mechanism it uses, in `idempotence`. A handler of another component's event
+has no `ignores` that rests on a value that can change; a filter that can
+change is in a handler of the stream's own events.
+
+### A consumer's stored position is not a fact to design on
+
+A consumer writes its position to the store only after each run of messages,
+a hundred by default, and not when it stops. So the stored position is behind
+what the consumer has handled, and it stays behind while the category is
+quiet. Do not design a step that needs the stored position to be current, and
+do not set the interval to one message to make it current. The stored
+position only saves work after a restart. Idempotence is the work of the
+handlers.
+
+**Why:** a write for each message that a consumer reads takes away most of
+its speed, for every message of the category, wanted or not. A consumer whose
+position is always current also hides a handler that is not idempotent, until
+the day that a message does arrive a second time. One design had a tool that
+must know when a consumer had read its category again from the start. It
+waited until the consumer's stored position had passed the end of the
+category. In a quiet category the stored position stayed a few messages
+below the end, so the wait never finished, and the repair that was proposed
+was an interval of one message.
+
+**In the model:** no handler, tool or scenario decides from a consumer's
+stored position. A step that must know that a message was handled reads what
+its handler wrote. A tool that must know that it has read a category to its
+end reads the category itself.
+
+### Give each read of a stream or a category its stop
+
+A handler or a tool that reads a stream or a category gives the read the
+place at which it stops: a position in a stream, or a global position in a
+category. Do not read "to the end" of a thing that still takes messages. Its
+end moves while the read runs, and nothing says that the read reaches it.
+
+**Why:** a tool was to read a whole category of another component, hand each
+wanted message to a handler, and then report that it had finished. Its first
+form read the category until no message was left. That category takes
+messages all day. It is unlikely that the tool never reaches the end, but
+nothing in the design makes it certain, and the report depends on it. With a
+stop at a global position that is fixed before the read starts, the read is
+finite, and the design can say who handles each message above the stop.
+
+**In the model:** each read of history in a `reads` names its stop: the
+version that the handler's write expects, or the position of the event that
+it handles. A tool's read of a category names the event whose global position
+is its stop, and says who handles the messages above it.
+
+### Build on Eventide's patterns, not on the store's mechanics
+
+A design uses the message store through what Eventide documents: streams and
+categories, expected versions, the sequence check, the reservation. No write,
+and no handler's idempotence, rests on how the store is built inside: its
+indexes, or a value that the store or the writer gives a message, such as its
+id.
+
+A query that only reads is not such a mechanic. A query class can select from
+the store's messages by category and message type, for example to list the
+entities of a category when a process starts.
+
+**Why:** the store belongs to another project, and no document promises its
+inside. One design made a copy idempotent by a message id that the handler
+calculated from the copied message, so that the store's unique index on ids
+refused a second copy. A build showed that it worked. It also showed a raw
+database error in place of a library's error, an entry in the database's log
+for each refusal, and a rule that no document of the store describes. The
+reviewer refused it: those mechanics "are not ours to play with".
+
+**In the model:** each `idempotence` is one of the mechanisms in "Every
+handler is idempotent, and the model says how". A tool reads with the
+libraries' readers, or with a query class that only reads.
 
 ### Keep each component's streams tidy
 
@@ -1038,6 +1190,7 @@ needs it, move the check to the application, or let the command through and
 correct forward. Before you propose a refusal, check it against the other
 rules here: a blank attribute is the command's validation, and a message can
 arrive in any order.
+
 
 ### Keep the component's facts true, and leave policy to people
 
