@@ -526,6 +526,15 @@ entity"), so its idempotence must be explicit. These are the mechanisms.
   it does not name stays lost. Change the step so that it passes no message
   that it can want later ("A handler that copies from another stream does not
   also filter").
+
+  One risk stays, and a design accepts it. A fault, such as wrong code in the
+  handler, can make the handler pass a message that it must apply. If the
+  consumer then goes on, the next message that the entity applies puts the
+  recorded global position above the passed one, and no replay brings it
+  back. When that occurs, it is a major problem. It is also a fact of every
+  idempotence that rests on a sequence, and it is almost always acceptable.
+  Do not design a repair for it, such as a repair command, or a list in
+  another component that finds such a message.
 - **A reservation.** This is for a command that carries its own idempotence
   key. The handler first writes a copy of the command, with `write.initial`,
   to a stream keyed by the original ids plus the key. A second copy finds
@@ -1181,7 +1190,8 @@ nothing shows and nothing can repair is not acceptable, however unlikely it
 is.
 
 This rule is about the design. A message that is lost because a handler's
-code is wrong is a fault of the build.
+code is wrong is a fault of the build, and a known risk of the sequence check
+("Every handler is idempotent").
 
 **Why:** a stream copied another component's documents, but only those
 inside a time window that an operator could widen. A document that was
