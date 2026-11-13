@@ -323,6 +323,22 @@ adjustment or a credit note, that the next run picks up, and a reconciliation
 finds the differences. A design can often use the same answer: a void that
 arrives after a payment becomes a deduction from the next payment.
 
+**Run what rests on the runtime.** A walk tests the rules as text. When a rule
+rests on how the runtime behaves (when a consumer writes its position, what a
+second delivery raises, in which order two writes become visible), build the
+least code that runs it against a real message store, and throw the code
+away. Its product is printed output that the reviewer judges, each number
+marked as a position or a global position, and a list of what did not work as
+the design says. Do it before the rule goes into the design.
+
+**Run the whole design before it is final.** When the model and its scenarios
+are agreed, build a throwaway runtime of the design: its streams, messages and
+handlers, with real consumers and no screens. Run each scenario through it
+against a real message store, and compare the output with the scenario's step
+table. A step that the runtime does not give as the table says is a finding,
+like a finding of a walk. Throw the code away: the component is built from the
+design, by its tests, and not from this code.
+
 ### 4. Present, only when the reviewer asks
 
 Read `references/presenting.md`. Draw the first one or two panels, and stop
