@@ -617,9 +617,14 @@ is its stop, and says who handles the messages above it.
 ### Build on Eventide's patterns, not on the store's mechanics
 
 A design uses the message store through what Eventide documents: streams and
-categories, expected versions, the sequence check, the reservation. It does
-not rest on how the store is built inside: its indexes, its tables, its SQL,
-or a value that the store or the writer gives a message, such as its id.
+categories, expected versions, the sequence check, the reservation. No write,
+and no handler's idempotence, rests on how the store is built inside: its
+indexes, or a value that the store or the writer gives a message, such as its
+id.
+
+A query that only reads is not such a mechanic. A query class can select from
+the store's messages by category and message type, for example to list the
+entities of a category when a process starts.
 
 **Why:** the store belongs to another project, and no document promises its
 inside. One design made a copy idempotent by a message id that the handler
@@ -631,7 +636,7 @@ reviewer refused it: those mechanics "are not ours to play with".
 
 **In the model:** each `idempotence` is one of the mechanisms in "Every
 handler is idempotent, and the model says how". A tool reads with the
-libraries' readers, not with SQL.
+libraries' readers, or with a query class that only reads.
 
 ### Keep each component's streams tidy
 
